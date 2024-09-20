@@ -1,5 +1,6 @@
 use crate::agent::MyAgent;
-use crate::game::{agent_trait::Agent, game_info::GameInfo};
+use crate::game::agent_trait::Agent;
+use crate::game::lobby_data::LobbyData;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::time::{timeout, Duration};
@@ -11,20 +12,21 @@ pub async fn handle_prepare_to_game(
     payload: serde_json::Value,
 ) -> Result<(), String> {
     // Parse the JSON with serde_json
-    let game_info_result: Result<GameInfo, String> = payload.try_into();
+    let lobby_data_result: Result<LobbyData, String> = payload.try_into();
 
-    let game_info = match game_info_result {
+    let lobby_data = match lobby_data_result {
         Ok(game_info) => game_info,
-        Err(e) => return Err(format!("Failed to parse game info: {}", e)),
+        Err(e) => return Err(format!("Failed to parse lobby data: {}", e)),
     };
 
     // Set the timeout duration
+    // TODO: Make this configurable
     let timeout_duration = Duration::from_secs(5);
 
     // Spawn a blocking task to create the new MyAgent and acquire the lock
     let agent_creation = tokio::task::spawn_blocking(move || {
         let mut agent_guard = agent.blocking_lock();
-        *agent_guard = Some(MyAgent::new(game_info));
+        *agent_guard = Some(MyAgent::new(lobby_data));
     });
 
     // Wrap the blocking task with a timeout

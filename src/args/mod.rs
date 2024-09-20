@@ -8,6 +8,9 @@ use clap::Parser;
     about = env!("CARGO_PKG_DESCRIPTION")
 )]
 pub struct Args {
+    #[clap(short, long)]
+    pub nickname: String,
+
     #[clap(long, default_value = "localhost")]
     pub host: String,
 
@@ -16,4 +19,7 @@ pub struct Args {
 
     #[clap(short, long, default_value = "")]
     pub code: String,
+
+    #[clap(short, long, default_value = "false")]
+    pub debug_quick_join: bool,
 }

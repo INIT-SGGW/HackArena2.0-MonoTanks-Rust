@@ -1,6 +1,6 @@
-use crate::game::agent_response::{move_direction::MoveDirection, rotation::Rotation};
+use crate::game::{agent_response::{move_direction::MoveDirection, rotation::Rotation}, lobby_data::LobbyData};
 pub use crate::game::{
-    agent_response::AgentResponsePayload, agent_trait::Agent, game_info::GameInfo,
+    agent_response::AgentResponsePayload, agent_trait::Agent,
     game_state::GameState,
 };
 
@@ -8,7 +8,7 @@ pub struct MyAgent {
 }
 
 impl Agent for MyAgent {
-    fn new(game_info: GameInfo) -> Self
+    fn new(lobby_data: LobbyData) -> Self
     where
         Self: Sized,
     {

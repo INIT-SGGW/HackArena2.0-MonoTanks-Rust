@@ -10,22 +10,22 @@ impl TryFrom<serde_json::Value> for GameState {
     type Error = String;
 
     fn try_from(payload: serde_json::Value) -> Result<Self, Self::Error> {
-        let time = parse_time(&payload)?;
+        let tick = parse_tick(&payload)?;
         let players = parse_players(&payload)?;
 
         let zones = parse_zones(&payload)?;
         let map = parse_map(&payload, &zones)?;
 
-        Ok(GameState::new(payload, time, players, map, zones))
+        Ok(GameState::new(payload, tick, players, map, zones))
     }
 }
 
-fn parse_time(payload: &serde_json::Value) -> Result<f64, String> {
+fn parse_tick(payload: &serde_json::Value) -> Result<u64, String> {
     payload
-        .get("time")
-        .ok_or("Missing time field")?
-        .as_f64()
-        .ok_or("time is not a float".to_owned())
+        .get("tick")
+        .ok_or("Missing tick field")?
+        .as_u64()
+        .ok_or("tick is not a u64".to_owned())
 }
 
 fn parse_players(payload: &Value) -> Result<Vec<Player>, String> {
@@ -132,13 +132,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_parse_time() {
+    fn test_parse_tick() {
         let payload = serde_json::json!({
-            "time": 123.456
+            "tick": 123
         });
 
-        let time = parse_time(&payload).unwrap();
-        assert_eq!(time, 123.456);
+        let tick = parse_tick(&payload).unwrap();
+        assert_eq!(tick, 123);
     }
 
     #[test]
@@ -162,7 +162,8 @@ mod tests {
                     "nickname": "Player 3",
                     "color": 4279933945u64,
                     "ping": 0,
-                    "score": 0
+                    "score": 3,
+                    "ticksToRegen": 4
                 }
             ]
         });
@@ -175,8 +176,9 @@ mod tests {
                 id: "e15a3449-bb72-4a3a-a5fc-42292189311e".to_owned(),
                 nickname: "Player 1".to_owned(),
                 color: 4294944256u64,
-                ping: 0,
+                ping: Some(0),
                 score: None,
+                ticks_to_regen: None,
             }
         );
         assert_eq!(
@@ -185,8 +187,9 @@ mod tests {
                 id: "953d0f9d-7126-4eb4-b48e-cfc6862033df".to_owned(),
                 nickname: "Player 2".to_owned(),
                 color: 4294925049u64,
-                ping: 0,
+                ping: Some(0),
                 score: None,
+                ticks_to_regen: None,
             }
         );
         assert_eq!(
@@ -195,8 +198,9 @@ mod tests {
                 id: "fd76a5bd-0c05-4b05-8f61-9f68a7bc2b1a".to_owned(),
                 nickname: "Player 3".to_owned(),
                 color: 4279933945u64,
-                ping: 0,
-                score: Some(0),
+                ping: Some(0),
+                score: Some(3),
+                ticks_to_regen: Some(4),
             }
         );
     }

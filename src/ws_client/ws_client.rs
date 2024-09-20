@@ -30,9 +30,15 @@ pub struct WebSocketClient {
 }
 
 impl WebSocketClient {
-    pub async fn connect(host: &str, port: u16, code: &str) -> Result<WebSocketClient, Error> {
+    pub async fn connect(
+        host: &str,
+        port: u16,
+        code: &str,
+        nickname: &str,
+        debug_quick_join: bool,
+    ) -> Result<WebSocketClient, Error> {
         // Construct proper url
-        let url = Self::construct_url(host, port, code);
+        let url = Self::construct_url(host, port, code, nickname, debug_quick_join);
 
         // Connect to the server
         println!("📞 Connecting to the server: {}", url);
@@ -69,11 +75,27 @@ impl WebSocketClient {
         try_join!(self.read_task, self.writer_task)
     }
 
-    pub fn construct_url(host: &str, port: u16, code: &str) -> String {
-        if code.is_empty() {
-            return format!("ws://{}:{}", host, port);
+    pub fn construct_url(
+        host: &str,
+        port: u16,
+        code: &str,
+        nickname: &str,
+        debug_quick_join: bool,
+    ) -> String {
+        let mut url = format!("ws://{}:{}/?nickname={}", host, port, nickname);
+
+        url.push_str("&typeOfPacketType=string");
+
+        if debug_quick_join {
+            url.push_str("&quickJoin=true");
         }
-        format!("ws://{}:{}/?joinCode={}", host, port, code)
+
+        if !code.is_empty() {
+            url.push_str("&joinCode=");
+            url.push_str(code);
+        }
+
+        url
     }
 
     fn create_writer_task(
@@ -145,6 +167,8 @@ impl WebSocketClient {
         tx: tokio::sync::mpsc::Sender<Message>,
         agent: Arc<Mutex<Option<MyAgent>>>,
     ) -> Result<(), Box<dyn std::error::Error>> {
+        // println!("📩 Received message: {}", message);
+
         let packet: Packet = serde_json::from_str(&message)
             .map_err(|e| format!("🚨 Error parsing JSON -> {}", e))?;
 
@@ -152,6 +176,8 @@ impl WebSocketClient {
             PacketType::LobbyData => {
                 handle_prepare_to_game(tx, agent, packet.payload).await?;
             }
+
+            PacketType::GameStart => {}
 
             PacketType::GameState => {
                 handle_next_move(tx, agent, packet.payload).await?;

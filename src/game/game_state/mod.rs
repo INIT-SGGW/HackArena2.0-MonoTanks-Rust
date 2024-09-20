@@ -15,14 +15,14 @@ pub struct GameState {
     raw_payload: serde_json::Value,
     map: Vec<Vec<Tile>>,
     players: Vec<Player>,
-    time: f64,
+    tick: u64,
     zones: Vec<Zone>,
 }
 
 impl GameState {
     pub fn new(
         payload: serde_json::Value,
-        time: f64,
+        tick: u64,
         players: Vec<Player>,
         map: Vec<Vec<Tile>>,
         zones: Vec<Zone>,
@@ -30,7 +30,7 @@ impl GameState {
         GameState {
             raw_payload: payload,
             map,
-            time,
+            tick,
             players,
             zones,
         }
@@ -48,8 +48,8 @@ impl GameState {
         &self.players
     }
 
-    pub fn get_time(&self) -> f64 {
-        self.time
+    pub fn get_time(&self) -> u64 {
+        self.tick
     }
 
     pub fn get_zones(&self) -> &Vec<Zone> {

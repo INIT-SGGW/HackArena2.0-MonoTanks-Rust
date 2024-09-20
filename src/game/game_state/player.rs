@@ -6,6 +6,7 @@ pub struct Player {
     pub id: String,
     pub nickname: String,
     pub color: u64,
-    pub ping: u64,
+    pub ping: Option<u64>,
     pub score: Option<u64>,
+    pub ticks_to_regen: Option<u64>,
 }

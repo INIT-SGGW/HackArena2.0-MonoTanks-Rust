@@ -1,7 +1,7 @@
-use super::{agent_response::AgentResponsePayload, game_info::GameInfo, game_state::GameState};
+use super::{agent_response::AgentResponsePayload, game_state::GameState, lobby_data::LobbyData};
 
 pub trait Agent: Send + Sync {
-    fn new(game_info: GameInfo) -> Self
+    fn new(game_info: LobbyData) -> Self
     where
         Self: Sized;
 
