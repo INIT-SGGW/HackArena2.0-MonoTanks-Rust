@@ -1,6 +1,7 @@
-use serde::Deserialize;
+use derive_more::derive::Constructor;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Eq, Hash, Constructor)]
 #[serde(rename_all = "camelCase")]
 pub struct ServerSettings {
     pub grid_dimension: u32,

@@ -1,6 +1,6 @@
 use crate::agent::MyAgent;
 use crate::game::agent_trait::Agent;
-use serde_json::Value;
+use crate::ws_client::packet::dto::raw_game_state::RawGameState;
 use std::sync::Arc;
 use tokio::sync::mpsc::Sender;
 use tokio::sync::Mutex;
@@ -10,14 +10,15 @@ use tokio_tungstenite::tungstenite::Message;
 pub async fn handle_next_move(
     tx: Sender<Message>,
     agent: Arc<Mutex<Option<MyAgent>>>,
-    payload: Value,
+    raw_game_state: RawGameState,
 ) -> Result<(), String> {
     // Set the timeout duration
+    // TODO: Make this configurable
     let timeout_duration = Duration::from_secs(5);
 
     // Spawn the blocking task with a timeout
     let next_move_task = tokio::task::spawn_blocking(move || -> Result<String, String> {
-        let game_state = payload
+        let game_state = raw_game_state
             .try_into()
             .map_err(|e| format!("Failed to parse into game state, {}", e))?;
 

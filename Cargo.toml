@@ -17,3 +17,5 @@ num_enum = "0.7.2"
 rand = "0.8.5"
 chrono = "0.4.38"
 clap = { version = "4.5.11", features = ["derive"] }
+subenum = "1.1.2"
+derive_more = { version = "1.0.0", features = ["full"] }

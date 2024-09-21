@@ -1,8 +1,8 @@
-use serde::Deserialize;
-
 use super::direction::Direction;
+use derive_more::derive::Constructor;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug, Clone, Serialize, PartialEq, Deserialize, Constructor)]
 #[serde(rename_all = "camelCase")]
 pub struct Bullet {
     pub direction: Direction,

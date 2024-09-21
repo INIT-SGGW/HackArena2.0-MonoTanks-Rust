@@ -1,21 +1,20 @@
-use crate::game::{agent_response::{move_direction::MoveDirection, rotation::Rotation}, lobby_data::LobbyData};
-pub use crate::game::{
-    agent_response::AgentResponsePayload, agent_trait::Agent,
-    game_state::GameState,
+use crate::game::agent_trait::Agent;
+use crate::ws_client::packet::dto::{
+    game_state::GameState, lobby_data::LobbyData, move_direction::MoveDirection, rotation::Rotation,
 };
+use crate::ws_client::packet::packet::AgentResponse;
 
-pub struct MyAgent {
-}
+pub struct MyAgent {}
 
 impl Agent for MyAgent {
     fn new(lobby_data: LobbyData) -> Self
     where
         Self: Sized,
     {
-        MyAgent {  }
+        MyAgent {}
     }
 
-    fn next_move(&mut self, game_state: GameState) -> AgentResponsePayload {
+    fn next_move(&mut self, game_state: GameState) -> AgentResponse {
         match rand::random::<f32>() {
             r if r < 0.33 => {
                 let direction = if rand::random::<bool>() {
@@ -24,7 +23,7 @@ impl Agent for MyAgent {
                     MoveDirection::Backward
                 };
 
-                AgentResponsePayload::Move { direction }
+                AgentResponse::TankMovement { direction }
             }
             r if r < 0.66 => {
                 let random_rotation = || match rand::random::<f32>() {
@@ -33,12 +32,12 @@ impl Agent for MyAgent {
                     _ => None,
                 };
 
-                AgentResponsePayload::Rotation {
+                AgentResponse::TankRotation {
                     tank_rotation: random_rotation(),
                     turret_rotation: random_rotation(),
                 }
             }
-            _ => AgentResponsePayload::Shoot,
+            _ => AgentResponse::TankShoot,
         }
     }
 

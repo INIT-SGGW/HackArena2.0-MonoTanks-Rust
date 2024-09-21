@@ -1,7 +1,8 @@
 use super::{direction::Direction, turret::Turret};
-use serde::Deserialize;
+use derive_more::derive::Constructor;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Constructor)]
 #[serde(rename_all = "camelCase")]
 pub struct Tank {
     pub direction: Direction,

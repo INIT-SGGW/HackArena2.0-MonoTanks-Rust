@@ -1,10 +1,12 @@
 pub mod server_settings;
 
-use super::game_state::player::Player;
-use serde::Deserialize;
+use derive_more::derive::Constructor;
+use serde::{Deserialize, Serialize};
 use server_settings::ServerSettings;
 
-#[derive(Debug, Clone, PartialEq, Deserialize)]
+use super::player::Player;
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Constructor, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub struct LobbyData {
     pub player_id: String,
@@ -12,6 +14,7 @@ pub struct LobbyData {
     pub server_settings: ServerSettings,
 }
 
+// TODO: Can we use a macro to generate this?
 impl TryFrom<serde_json::Value> for LobbyData {
     type Error = String;
 

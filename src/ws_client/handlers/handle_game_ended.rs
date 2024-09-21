@@ -1,13 +1,15 @@
 use crate::agent::MyAgent;
 use crate::game::agent_trait::Agent;
+use crate::ws_client::packet::dto::game_state::GameState;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::time::{timeout, Duration};
 
 pub async fn handle_game_ended(
     agent: Arc<Mutex<Option<MyAgent>>>,
-    payload: serde_json::Value,
+    payload: GameState,
 ) -> Result<(), String> {
+    // TODO: Make this configurable
     // Set the timeout duration
     let timeout_duration = Duration::from_secs(30);
 

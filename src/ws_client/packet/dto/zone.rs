@@ -1,6 +1,7 @@
-use serde::Deserialize;
+use derive_more::derive::{Constructor, IsVariant};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Constructor)]
 #[serde(rename_all = "camelCase")]
 pub struct Zone {
     pub index: u8,
@@ -11,7 +12,7 @@ pub struct Zone {
     pub status: ZoneStatus,
 }
 
-#[derive(Debug, Clone, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, IsVariant)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum ZoneStatus {
     Neutral,

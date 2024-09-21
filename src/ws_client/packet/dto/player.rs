@@ -1,6 +1,7 @@
-use serde::Deserialize;
+use derive_more::derive::Constructor;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Constructor)]
 #[serde(rename_all = "camelCase")]
 pub struct Player {
     pub id: String,

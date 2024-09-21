@@ -18,10 +18,9 @@ use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, Web
 
 use super::{
     handlers::{
-        handle_game_ended::handle_game_ended, handle_next_move::handle_next_move,
-        handle_prepare_to_game::handle_prepare_to_game,
+        handle_next_move::handle_next_move, handle_prepare_to_game::handle_prepare_to_game,
     },
-    packet::{packet::Packet, packet_type_enum::PacketType},
+    packet::packet::Packet,
 };
 
 pub struct WebSocketClient {
@@ -167,39 +166,26 @@ impl WebSocketClient {
         tx: tokio::sync::mpsc::Sender<Message>,
         agent: Arc<Mutex<Option<MyAgent>>>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        // println!("📩 Received message: {}", message);
-
         let packet: Packet = serde_json::from_str(&message)
-            .map_err(|e| format!("🚨 Error parsing JSON -> {}", e))?;
+            .map_err(|e| format!("🚨 Error parsing message -> {}", e))?;
 
-        match packet.packet_type {
-            PacketType::LobbyData => {
-                handle_prepare_to_game(tx, agent, packet.payload).await?;
+        match packet {
+            Packet::Ping => Self::respond_to_ping(tx).await?,
+            Packet::LobbyData(lobby_data) => handle_prepare_to_game(tx, agent, lobby_data).await?,
+            Packet::GameStart => {
+                println!("🚀 Game started");
             }
-
-            PacketType::GameStart => {}
-
-            PacketType::GameState => {
-                handle_next_move(tx, agent, packet.payload).await?;
+            Packet::GameState(raw_game_state) => {
+                handle_next_move(tx, agent, raw_game_state).await?
             }
+            Packet::GameEnd => todo!(),
 
-            PacketType::GameEnded => {
-                handle_game_ended(agent, packet.payload).await?;
-            }
-
-            PacketType::Ping => {
-                Self::respond_to_ping(tx).await?;
-            }
-
-            PacketType::TankMovement
-            | PacketType::TankRotation
-            | PacketType::TankShoot
-            | PacketType::Ready => {
+            // These packets are never send by the server
+            Packet::Pong
+            | Packet::TankMovement { .. }
+            | Packet::TankRotation { .. }
+            | Packet::TankShoot => {
                 unreachable!()
-            }
-
-            PacketType::Pong | PacketType::Unknown => {
-                unimplemented!();
             }
         };
 
@@ -207,10 +193,9 @@ impl WebSocketClient {
     }
 
     async fn respond_to_ping(tx: tokio::sync::mpsc::Sender<Message>) -> Result<(), String> {
-        let response = Packet::construct_pong_packet();
-        let response_string = serde_json::to_string(&response)
+        let response = serde_json::to_string(&Packet::Pong)
             .map_err(|e| format!("🚨 Error serializing Pong -> {}", e))?;
-        tx.send(Message::Text(response_string))
+        tx.send(Message::Text(response))
             .await
             .map_err(|e| format!("🚨 Error sending Pong -> {}", e))?;
 

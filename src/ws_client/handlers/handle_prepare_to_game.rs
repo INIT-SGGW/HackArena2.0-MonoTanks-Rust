@@ -1,6 +1,6 @@
 use crate::agent::MyAgent;
 use crate::game::agent_trait::Agent;
-use crate::game::lobby_data::LobbyData;
+use crate::ws_client::packet::dto::lobby_data::LobbyData;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::time::{timeout, Duration};
@@ -9,16 +9,8 @@ use tokio_tungstenite::tungstenite::Message;
 pub async fn handle_prepare_to_game(
     _tx: tokio::sync::mpsc::Sender<Message>,
     agent: Arc<Mutex<Option<MyAgent>>>,
-    payload: serde_json::Value,
+    lobby_data: LobbyData,
 ) -> Result<(), String> {
-    // Parse the JSON with serde_json
-    let lobby_data_result: Result<LobbyData, String> = payload.try_into();
-
-    let lobby_data = match lobby_data_result {
-        Ok(game_info) => game_info,
-        Err(e) => return Err(format!("Failed to parse lobby data: {}", e)),
-    };
-
     // Set the timeout duration
     // TODO: Make this configurable
     let timeout_duration = Duration::from_secs(5);
@@ -35,13 +27,6 @@ pub async fn handle_prepare_to_game(
         Ok(Err(e)) => return Err(format!("Task failed: {}", e)),
         Err(_) => return Err("Agent creation timed out".to_string()),
     }
-
-    // let response = serde_json::json!({
-    //     "type": PacketType::Ready as u64,
-    //     "payload": {}
-    // }).to_string();
-
-    // tx.send(Message::Text(response)).await.unwrap();
 
     Ok(())
 }
