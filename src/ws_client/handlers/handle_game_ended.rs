@@ -8,6 +8,8 @@ pub async fn handle_game_ended(
     agent: Arc<Mutex<Option<MyAgent>>>,
     game_end: GameEnd,
 ) -> Result<(), String> {
+    println!("🏁 Game ended");
+
     let result = {
         let agent_lock = agent.lock().await;
 

@@ -165,9 +165,7 @@ impl WebSocketClient {
         match packet {
             Packet::Ping => Self::respond_to_ping(tx).await?,
             Packet::LobbyData(lobby_data) => handle_prepare_to_game(tx, agent, lobby_data).await?,
-            Packet::GameStart => {
-                println!("🚀 Game started");
-            }
+            Packet::GameStart => println!("🎲 Game started"),
             Packet::GameState(raw_game_state) => {
                 handle_next_move(tx, agent, raw_game_state).await?
             }

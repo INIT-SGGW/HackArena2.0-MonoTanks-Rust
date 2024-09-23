@@ -20,10 +20,7 @@ impl Agent for MyAgent {
     }
 
     fn next_move(&mut self, game_state: GameState) -> AgentResponse {
-        let r = rand::random::<f32>();
-        // println!("Random value for main match: {}", r);
-
-        match r {
+        match rand::random::<f32>() {
             r if r < 0.33 => {
                 let direction = if rand::random::<bool>() {
                     MoveDirection::Forward
@@ -31,36 +28,21 @@ impl Agent for MyAgent {
                     MoveDirection::Backward
                 };
 
-                // println!("Selected MoveDirection: {:?}", direction);
                 AgentResponse::TankMovement { direction }
             }
             r if r < 0.66 => {
-                let random_rotation = || {
-                    let rr = rand::random::<f32>();
-                    // println!("Random value for rotation match: {}", rr);
-                    match rr {
-                        rr if rr < 0.33 => Some(Rotation::Left),
-                        rr if rr < 0.66 => Some(Rotation::Right),
-                        _ => None,
-                    }
+                let random_rotation = || match rand::random::<f32>() {
+                    r if r < 0.33 => Some(Rotation::Left),
+                    r if r < 0.66 => Some(Rotation::Right),
+                    _ => None,
                 };
 
-                let tank_rotation = random_rotation();
-                let turret_rotation = random_rotation();
-                // println!(
-                //     "Selected TankRotation: {:?}, TurretRotation: {:?}",
-                //     tank_rotation, turret_rotation
-                // );
-
                 AgentResponse::TankRotation {
-                    tank_rotation,
-                    turret_rotation,
+                    tank_rotation: random_rotation(),
+                    turret_rotation: random_rotation(),
                 }
             }
-            _ => {
-                // println!("Selected TankShoot");
-                AgentResponse::TankShoot
-            }
+            _ => AgentResponse::TankShoot,
         }
     }
 

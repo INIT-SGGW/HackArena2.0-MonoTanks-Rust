@@ -11,7 +11,11 @@ pub async fn handle_prepare_to_game(
     lobby_data: LobbyData,
 ) -> Result<(), String> {
     let mut agent_guard = agent.lock().await;
-    *agent_guard = Some(MyAgent::new(lobby_data));
+
+    if let None = *agent_guard {
+        *agent_guard = Some(MyAgent::new(lobby_data));
+        println!("🤖 Created agent");
+    }
 
     Ok(())
 }
