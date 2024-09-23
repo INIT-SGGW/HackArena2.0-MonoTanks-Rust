@@ -26,6 +26,7 @@ pub enum Packet {
         direction: MoveDirection,
     },
     #[subenum(AgentResponse)]
+    #[serde(rename_all = "camelCase")]
     TankRotation {
         tank_rotation: Option<Rotation>,
         turret_rotation: Option<Rotation>,

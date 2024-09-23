@@ -31,6 +31,8 @@ pub async fn handle_next_move(
 
     let response = serde_json::to_string(&agent_response).map_err(|e| e.to_string())?;
 
+    println!("🤖 Agent response: {}", response);
+
     // Send the response
     tx.send(Message::Text(response))
         .await
