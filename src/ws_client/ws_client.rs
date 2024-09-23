@@ -171,6 +171,16 @@ impl WebSocketClient {
             }
             Packet::GameEnd(game_end) => handle_game_ended(agent, game_end).await?,
 
+            Packet::AlreadyMadeMovement => {
+                println!("🚨 Already made movement");
+            }
+            Packet::ConnectionAccepted => {
+                println!("🎉 Connection accepted");
+            }
+            Packet::ConnectionRejected { reason } => {
+                println!("🚨 Connection rejected -> {}", reason);
+            }
+
             // These packets are never send by the server
             Packet::Pong
             | Packet::TankMovement { .. }

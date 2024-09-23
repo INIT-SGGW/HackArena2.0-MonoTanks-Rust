@@ -36,6 +36,14 @@ pub enum Packet {
     TankShoot,
 
     GameEnd(GameEnd),
+
+    #[serde(with = "empty_payload")]
+    AlreadyMadeMovement,
+    #[serde(with = "empty_payload")]
+    ConnectionAccepted,
+    ConnectionRejected {
+        reason: String,
+    },
 }
 
 #[cfg(test)]
