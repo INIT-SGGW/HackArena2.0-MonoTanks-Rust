@@ -1,27 +1,20 @@
 use crate::agent::MyAgent;
-use futures_util::{
-    stream::{SplitSink, SplitStream},
-    SinkExt, StreamExt,
-};
+use futures_util::stream::{SplitSink, SplitStream};
+use futures_util::SinkExt;
+use futures_util::StreamExt;
 use std::sync::Arc;
-use tokio::{
-    net::TcpStream,
-    sync::{
-        mpsc::{Receiver, Sender},
-        Mutex,
-    },
-    task::{JoinError, JoinHandle},
-    try_join,
-};
+use tokio::net::TcpStream;
+use tokio::sync::mpsc::{Receiver, Sender};
+use tokio::sync::Mutex;
+use tokio::task::{JoinError, JoinHandle};
+use tokio::try_join;
 use tokio_tungstenite::tungstenite::Error;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
-use super::{
-    handlers::{
-        handle_next_move::handle_next_move, handle_prepare_to_game::handle_prepare_to_game,
-    },
-    packet::packet::Packet,
-};
+use super::handlers::handle_game_ended::handle_game_ended;
+use super::handlers::handle_next_move::handle_next_move;
+use super::handlers::handle_prepare_to_game::handle_prepare_to_game;
+use super::packet::packet::Packet;
 
 pub struct WebSocketClient {
     read_task: JoinHandle<()>,
@@ -178,7 +171,7 @@ impl WebSocketClient {
             Packet::GameState(raw_game_state) => {
                 handle_next_move(tx, agent, raw_game_state).await?
             }
-            Packet::GameEnd => todo!(),
+            Packet::GameEnd(game_end) => handle_game_ended(agent, game_end).await?,
 
             // These packets are never send by the server
             Packet::Pong

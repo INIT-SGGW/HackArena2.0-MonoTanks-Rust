@@ -10,7 +10,7 @@ pub async fn handle_prepare_to_game(
     agent: Arc<Mutex<Option<MyAgent>>>,
     lobby_data: LobbyData,
 ) -> Result<(), String> {
-    let mut agent_guard = agent.blocking_lock();
+    let mut agent_guard = agent.lock().await;
     *agent_guard = Some(MyAgent::new(lobby_data));
 
     Ok(())

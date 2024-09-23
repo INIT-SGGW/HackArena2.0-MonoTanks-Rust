@@ -1,3 +1,4 @@
+use super::dto::game_end::GameEnd;
 use super::dto::raw_game_state::RawGameState;
 use super::dto::rotation::Rotation;
 use super::dto::{lobby_data::LobbyData, move_direction::MoveDirection};
@@ -33,8 +34,7 @@ pub enum Packet {
     #[serde(with = "empty_payload")]
     TankShoot,
 
-    #[serde(with = "empty_payload")]
-    GameEnd,
+    GameEnd(GameEnd),
 }
 
 #[cfg(test)]
