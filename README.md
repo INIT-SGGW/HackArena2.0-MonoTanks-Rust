@@ -173,3 +173,6 @@ Steps:
 If the server is running on your local machine, use the
 `--host host.docker.internal` flag to connect the Docker container to your local
 host.
+
+If you are using a machine with ARM architecture, you should modify the
+Dockerfile and change every occurrence of `x86_64` to `aarch64`.
