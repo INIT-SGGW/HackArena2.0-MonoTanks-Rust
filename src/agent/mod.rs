@@ -1,9 +1,9 @@
+use crate::game::agent_response::AgentResponse;
 use crate::game::agent_trait::Agent;
 use crate::ws_client::packet::dto::game_end::GameEnd;
 use crate::ws_client::packet::dto::{
     game_state::GameState, lobby_data::LobbyData, move_direction::MoveDirection, rotation::Rotation,
 };
-use crate::ws_client::packet::packet::AgentResponse;
 
 pub struct MyAgent {
     my_id: String,

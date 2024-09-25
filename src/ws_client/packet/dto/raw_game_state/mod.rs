@@ -9,8 +9,8 @@ use super::player::Player;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Constructor)]
 #[serde(rename_all = "camelCase")]
 pub struct RawGameState {
+    pub id: String,
     pub tick: u64,
-    pub player_id: String,
     pub players: Vec<Player>,
     pub map: Map,
 }

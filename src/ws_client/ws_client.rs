@@ -36,7 +36,7 @@ impl WebSocketClient {
         println!("📞 Connecting to the server: {}", url);
         let websocket_stream = match connect_async(&url).await {
             Ok((stream, _)) => {
-                println!("🎉 Successfully connected to the server");
+                println!("🌟 Successfully connected to the server");
                 stream
             }
             Err(e) => return Err(e),
@@ -77,6 +77,7 @@ impl WebSocketClient {
         let mut url = format!("ws://{}:{}/?nickname={}", host, port, nickname);
 
         url.push_str("&typeOfPacketType=string");
+        url.push_str("&playerType=hackatonBot");
 
         if debug_quick_join {
             url.push_str("&quickJoin=true");
@@ -163,17 +164,11 @@ impl WebSocketClient {
             .map_err(|e| format!("🚨 Error parsing message -> {}", e))?;
 
         match packet {
-            Packet::Ping => Self::respond_to_ping(tx).await?,
-            Packet::LobbyData(lobby_data) => handle_prepare_to_game(tx, agent, lobby_data).await?,
-            Packet::GameStart => println!("🎲 Game started"),
-            Packet::GameState(raw_game_state) => {
-                handle_next_move(tx, agent, raw_game_state).await?
-            }
-            Packet::GameEnd(game_end) => handle_game_ended(agent, game_end).await?,
+            Packet::Ping => tx
+                .send(Message::Text(Packet::Pong.into()))
+                .await
+                .map_err(|e| format!("🚨 Error sending Pong -> {}", e))?,
 
-            Packet::AlreadyMadeMovement => {
-                println!("🚨 Already made movement");
-            }
             Packet::ConnectionAccepted => {
                 println!("🎉 Connection accepted");
             }
@@ -181,24 +176,54 @@ impl WebSocketClient {
                 println!("🚨 Connection rejected -> {}", reason);
             }
 
+            Packet::LobbyData(lobby_data) => {
+                println!("🎳 Lobby data received");
+                handle_prepare_to_game(tx, agent, lobby_data).await?
+            }
+
+            Packet::LobbyDeleted => {
+                println!("🚪 Lobby deleted");
+            }
+
+            Packet::GameStart => println!("🎲 Game started"),
+            Packet::GameState(raw_game_state) => {
+                // println!("🎮 Game state received");
+                handle_next_move(tx, agent, raw_game_state).await?
+            }
+
+            Packet::GameEnd(game_end) => {
+                println!("🏁 Game ended");
+                handle_game_ended(agent, game_end).await?
+            }
+
+            // Warnings
+            Packet::PlayerAlreadyMadeActionWarning => {
+                println!("🚨 Player already made action warning");
+            }
+            Packet::MissingGameStateIdWarning => {
+                println!("🚨 Missing game state id warning");
+            }
+
+            Packet::SlowResponseWarning => {
+                println!("🚨 Slow response warning");
+            }
+
+            // Errors
+            Packet::InvalidPacketTypeError => {
+                println!("🚨 Client sent an invalid packet type error");
+            }
+            Packet::InvalidPacketUsageError => {
+                println!("🚨 Client used packet in invalid way");
+            }
+
             // These packets are never send by the server
             Packet::Pong
             | Packet::TankMovement { .. }
             | Packet::TankRotation { .. }
-            | Packet::TankShoot => {
+            | Packet::TankShoot { .. } => {
                 unreachable!()
             }
         };
-
-        Ok(())
-    }
-
-    async fn respond_to_ping(tx: tokio::sync::mpsc::Sender<Message>) -> Result<(), String> {
-        let response = serde_json::to_string(&Packet::Pong)
-            .map_err(|e| format!("🚨 Error serializing Pong -> {}", e))?;
-        tx.send(Message::Text(response))
-            .await
-            .map_err(|e| format!("🚨 Error sending Pong -> {}", e))?;
 
         Ok(())
     }

@@ -2,11 +2,10 @@ use super::dto::game_end::GameEnd;
 use super::dto::raw_game_state::RawGameState;
 use super::dto::rotation::Rotation;
 use super::dto::{lobby_data::LobbyData, move_direction::MoveDirection};
+use crate::game::agent_response::AgentResponse;
 use crate::ws_client::packet::empty_payload;
 use serde::{Deserialize, Serialize};
-use subenum::subenum;
 
-#[subenum(AgentResponse)]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", tag = "type", content = "payload")]
 pub enum Packet {
@@ -15,35 +14,84 @@ pub enum Packet {
     #[serde(with = "empty_payload")]
     Pong,
 
-    LobbyData(LobbyData),
-
-    #[serde(with = "empty_payload")]
-    GameStart,
-
-    GameState(RawGameState),
-    #[subenum(AgentResponse)]
-    TankMovement {
-        direction: MoveDirection,
-    },
-    #[subenum(AgentResponse)]
-    #[serde(rename_all = "camelCase")]
-    TankRotation {
-        tank_rotation: Option<Rotation>,
-        turret_rotation: Option<Rotation>,
-    },
-    #[subenum(AgentResponse)]
-    #[serde(with = "empty_payload")]
-    TankShoot,
-
-    GameEnd(GameEnd),
-
-    #[serde(with = "empty_payload")]
-    AlreadyMadeMovement,
     #[serde(with = "empty_payload")]
     ConnectionAccepted,
     ConnectionRejected {
         reason: String,
     },
+
+    LobbyData(LobbyData),
+
+    #[serde(with = "empty_payload")]
+    LobbyDeleted,
+
+    #[serde(with = "empty_payload")]
+    GameStart,
+
+    GameState(RawGameState),
+
+    #[serde(rename_all = "camelCase")]
+    TankMovement {
+        game_state_id: String,
+        direction: MoveDirection,
+    },
+
+    #[serde(rename_all = "camelCase")]
+    TankRotation {
+        game_state_id: String,
+        tank_rotation: Option<Rotation>,
+        turret_rotation: Option<Rotation>,
+    },
+
+    #[serde(rename_all = "camelCase")]
+    TankShoot {
+        game_state_id: String,
+    },
+
+    GameEnd(GameEnd),
+
+    // Warnings
+    #[serde(with = "empty_payload")]
+    PlayerAlreadyMadeActionWarning,
+
+    #[serde(with = "empty_payload")]
+    MissingGameStateIdWarning,
+
+    #[serde(with = "empty_payload")]
+    SlowResponseWarning,
+
+    // Errors
+    #[serde(with = "empty_payload")]
+    InvalidPacketTypeError,
+
+    #[serde(with = "empty_payload")]
+    InvalidPacketUsageError,
+}
+
+impl From<Packet> for String {
+    fn from(packet: Packet) -> Self {
+        serde_json::to_string(&packet).unwrap()
+    }
+}
+
+impl AgentResponse {
+    pub fn to_packet(self, game_state_id: String) -> Packet {
+        match self {
+            AgentResponse::TankMovement { direction } => Packet::TankMovement {
+                game_state_id,
+                direction,
+            },
+            AgentResponse::TankRotation {
+                tank_rotation,
+                turret_rotation,
+            } => Packet::TankRotation {
+                game_state_id,
+                tank_rotation,
+                turret_rotation,
+            },
+            AgentResponse::TankShoot => Packet::TankShoot { game_state_id },
+        }
+    }
 }
 
 #[cfg(test)]

@@ -11,6 +11,8 @@ pub async fn handle_next_move(
     agent: Arc<Mutex<Option<MyAgent>>>,
     raw_game_state: RawGameState,
 ) -> Result<(), String> {
+    let game_state_id = raw_game_state.id.clone();
+
     // Spawn the blocking task with a timeout
     let game_state = raw_game_state
         .try_into()
@@ -29,10 +31,11 @@ pub async fn handle_next_move(
     }
     .map_err(|e| format!("Failed to get agent response, {}", e))?;
 
-    let response = serde_json::to_string(&agent_response).map_err(|e| e.to_string())?;
+    let response_packet = agent_response.to_packet(game_state_id);
+    let response_string = serde_json::to_string(&response_packet).map_err(|e| e.to_string())?;
 
     // Send the response
-    tx.send(Message::Text(response))
+    tx.send(Message::Text(response_string))
         .await
         .map_err(|_| "Failed to send message")?;
 

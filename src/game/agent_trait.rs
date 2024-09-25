@@ -1,8 +1,8 @@
-// use super::agent_response::AgentResponsePayload;
-use crate::ws_client::packet::{
-    dto::{game_end::GameEnd, game_state::GameState, lobby_data::LobbyData},
-    packet::AgentResponse,
+use crate::ws_client::packet::dto::{
+    game_end::GameEnd, game_state::GameState, lobby_data::LobbyData,
 };
+
+use super::agent_response::AgentResponse;
 
 pub trait Agent: Send + Sync {
     fn new(game_info: LobbyData) -> Self
