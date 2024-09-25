@@ -1,5 +1,5 @@
-use crate::agent::MyAgent;
-use crate::game::agent_trait::Agent;
+use crate::agent::Agent;
+use crate::game::agent_trait::AgentTrait;
 use crate::ws_client::packet::dto::raw_game_state::RawGameState;
 use std::sync::Arc;
 use tokio::sync::mpsc::Sender;
@@ -8,7 +8,7 @@ use tokio_tungstenite::tungstenite::Message;
 
 pub async fn handle_next_move(
     tx: Sender<Message>,
-    agent: Arc<Mutex<Option<MyAgent>>>,
+    agent: Arc<Mutex<Option<Agent>>>,
     raw_game_state: RawGameState,
 ) -> Result<(), String> {
     let game_state_id = raw_game_state.id.clone();

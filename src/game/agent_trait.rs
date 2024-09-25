@@ -4,7 +4,7 @@ use crate::ws_client::packet::dto::{
 
 use super::agent_response::AgentResponse;
 
-pub trait Agent: Send + Sync {
+pub trait AgentTrait: Send + Sync {
     fn new(game_info: LobbyData) -> Self
     where
         Self: Sized;

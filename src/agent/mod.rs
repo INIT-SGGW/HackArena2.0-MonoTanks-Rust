@@ -1,20 +1,20 @@
 use crate::game::agent_response::AgentResponse;
-use crate::game::agent_trait::Agent;
+use crate::game::agent_trait::AgentTrait;
 use crate::ws_client::packet::dto::game_end::GameEnd;
 use crate::ws_client::packet::dto::{
     game_state::GameState, lobby_data::LobbyData, move_direction::MoveDirection, rotation::Rotation,
 };
 
-pub struct MyAgent {
+pub struct Agent {
     my_id: String,
 }
 
-impl Agent for MyAgent {
+impl AgentTrait for Agent {
     fn new(lobby_data: LobbyData) -> Self
     where
         Self: Sized,
     {
-        MyAgent {
+        Agent {
             my_id: lobby_data.player_id,
         }
     }
@@ -47,7 +47,6 @@ impl Agent for MyAgent {
     }
 
     fn on_game_ended(&self, game_end: GameEnd) {
-        println!("Game ended");
         let winner = game_end
             .players
             .iter()

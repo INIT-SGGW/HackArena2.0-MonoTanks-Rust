@@ -1,15 +1,13 @@
-use crate::agent::MyAgent;
-use crate::game::agent_trait::Agent;
+use crate::agent::Agent;
+use crate::game::agent_trait::AgentTrait;
 use crate::ws_client::packet::dto::game_end::GameEnd;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
 pub async fn handle_game_ended(
-    agent: Arc<Mutex<Option<MyAgent>>>,
+    agent: Arc<Mutex<Option<Agent>>>,
     game_end: GameEnd,
 ) -> Result<(), String> {
-    println!("🏁 Game ended");
-
     let result = {
         let agent_lock = agent.lock().await;
 

@@ -1,4 +1,4 @@
-use crate::agent::MyAgent;
+use crate::agent::Agent;
 use futures_util::stream::{SplitSink, SplitStream};
 use futures_util::SinkExt;
 use futures_util::StreamExt;
@@ -108,7 +108,7 @@ impl WebSocketClient {
     fn create_reader_task(
         mut read: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
         tx: Sender<Message>,
-        agent: Arc<Mutex<Option<MyAgent>>>,
+        agent: Arc<Mutex<Option<Agent>>>,
     ) -> JoinHandle<()> {
         tokio::spawn(async move {
             while let Some(message) = read.next().await {
@@ -127,7 +127,7 @@ impl WebSocketClient {
     async fn process_message(
         message: Message,
         tx: Sender<Message>,
-        agent: Arc<Mutex<Option<MyAgent>>>,
+        agent: Arc<Mutex<Option<Agent>>>,
     ) {
         match message {
             Message::Text(message) => {
@@ -158,7 +158,7 @@ impl WebSocketClient {
     async fn process_text_message(
         message: String,
         tx: tokio::sync::mpsc::Sender<Message>,
-        agent: Arc<Mutex<Option<MyAgent>>>,
+        agent: Arc<Mutex<Option<Agent>>>,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let packet: Packet = serde_json::from_str(&message)
             .map_err(|e| format!("🚨 Error parsing message -> {}", e))?;
