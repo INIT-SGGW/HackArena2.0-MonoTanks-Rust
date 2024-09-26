@@ -27,10 +27,9 @@ impl WebSocketClient {
         port: u16,
         code: &str,
         nickname: &str,
-        debug_quick_join: bool,
     ) -> Result<WebSocketClient, Error> {
         // Construct proper url
-        let url = Self::construct_url(host, port, code, nickname, debug_quick_join);
+        let url = Self::construct_url(host, port, code, nickname);
 
         // Connect to the server
         println!("[System] 📞 Connecting to the server: {}", url);
@@ -67,21 +66,11 @@ impl WebSocketClient {
         try_join!(self.read_task, self.writer_task)
     }
 
-    pub fn construct_url(
-        host: &str,
-        port: u16,
-        code: &str,
-        nickname: &str,
-        debug_quick_join: bool,
-    ) -> String {
+    pub fn construct_url(host: &str, port: u16, code: &str, nickname: &str) -> String {
         let mut url = format!("ws://{}:{}/?nickname={}", host, port, nickname);
 
         url.push_str("&typeOfPacketType=string");
         url.push_str("&playerType=hackatonBot");
-
-        if debug_quick_join {
-            url.push_str("&quickJoin=true");
-        }
 
         if !code.is_empty() {
             url.push_str("&joinCode=");

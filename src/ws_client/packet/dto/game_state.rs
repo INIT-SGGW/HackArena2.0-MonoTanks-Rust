@@ -7,11 +7,19 @@ use super::{
 
 use derive_more::Constructor;
 
+/// Represents the current state of the game.
 #[derive(Constructor, Clone, Debug, PartialEq)]
 pub struct GameState {
+    /// A 2D vector representing the game map, where each element is a `Tile`.
     pub map: Vec<Vec<Tile>>,
+
+    /// A vector of `Player` objects representing all the players in the game.
     pub players: Vec<Player>,
+
+    /// The current tick of the game.
     pub tick: u64,
+
+    /// A vector of `Zone` objects representing different zones in the game.
     pub zones: Vec<Zone>,
 }
 

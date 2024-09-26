@@ -1,6 +1,7 @@
 use derive_more::derive::{Constructor, IsVariant};
 use serde::{Deserialize, Serialize};
 
+/// Represents a zone in the game world.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Constructor)]
 #[serde(rename_all = "camelCase")]
 pub struct Zone {
@@ -12,31 +13,60 @@ pub struct Zone {
     pub status: ZoneStatus,
 }
 
+/// Represents the status of a zone.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, IsVariant)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum ZoneStatus {
+    /// The zone is neutral and not controlled by any player.
     Neutral,
 
-    #[serde(rename_all = "camelCase")]
-    BeingCaptured {
-        remaining_ticks: u64,
-        player_id: String,
-    },
+    /// The zone is being captured by a player.
+    BeingCaptured(BeingCapturedStatus),
 
-    #[serde(rename_all = "camelCase")]
-    Captured {
-        player_id: String,
-    },
+    /// The zone has been captured by a player and he receives points.
+    Captured(CapturedStatus),
 
-    #[serde(rename_all = "camelCase")]
-    BeingContested {
-        captured_by_id: Option<String>,
-    },
+    /// The zone is being contested by players.
+    BeingContested(BeingContestedStatus),
 
-    #[serde(rename_all = "camelCase")]
-    BeingRetaken {
-        remaining_ticks: u64,
-        captured_by_id: String,
-        retaken_by_id: String,
-    },
+    /// The zone is being retaken by another player.
+    BeingRetaken(BeingRetakenStatus),
+}
+
+/// Represents the status of a zone being captured.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[serde(rename_all = "camelCase")]
+pub struct BeingCapturedStatus {
+    /// The remaining ticks until the zone is captured.
+    pub remaining_ticks: u64,
+    /// The ID of the player capturing the zone.
+    pub player_id: String,
+}
+
+/// Represents the status of a zone that has been captured.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[serde(rename_all = "camelCase")]
+pub struct CapturedStatus {
+    /// The ID of the player who captured the zone.
+    pub player_id: String,
+}
+
+/// Represents the status of a zone being contested.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[serde(rename_all = "camelCase")]
+pub struct BeingContestedStatus {
+    /// The ID of the player who captured the zone, if any.
+    pub captured_by_id: Option<String>,
+}
+
+/// Represents the status of a zone being retaken.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[serde(rename_all = "camelCase")]
+pub struct BeingRetakenStatus {
+    /// The remaining ticks until the zone is retaken.
+    pub remaining_ticks: u64,
+    /// The ID of the player who previously captured the zone.
+    pub captured_by_id: String,
+    /// The ID of the player retaking the zone.
+    pub retaken_by_id: String,
 }
