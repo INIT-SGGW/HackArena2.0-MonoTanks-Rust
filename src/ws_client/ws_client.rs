@@ -33,10 +33,10 @@ impl WebSocketClient {
         let url = Self::construct_url(host, port, code, nickname, debug_quick_join);
 
         // Connect to the server
-        println!("📞 Connecting to the server: {}", url);
+        println!("[System] 📞 Connecting to the server: {}", url);
         let websocket_stream = match connect_async(&url).await {
             Ok((stream, _)) => {
-                println!("🌟 Successfully connected to the server");
+                println!("[System] 🌟 Successfully connected to the server");
                 stream
             }
             Err(e) => return Err(e),
@@ -99,7 +99,7 @@ impl WebSocketClient {
             while let Some(message) = rx.recv().await {
                 match write.send(message).await {
                     Ok(_) => {}
-                    Err(e) => eprintln!("🌋 WebSocket send error -> {}", e),
+                    Err(e) => eprintln!("[System] 🌋 WebSocket send error -> {}", e),
                 }
             }
         })
@@ -117,7 +117,7 @@ impl WebSocketClient {
                         tokio::spawn(Self::process_message(message, tx.clone(), agent.clone()));
                     }
                     Err(e) => {
-                        eprintln!("🌋 WebSocket receive error -> {}", e);
+                        eprintln!("[System] 🌋 WebSocket receive error -> {}", e);
                     }
                 }
             }
@@ -132,25 +132,25 @@ impl WebSocketClient {
         match message {
             Message::Text(message) => {
                 if let Err(e) = Self::process_text_message(message.clone(), tx, agent).await {
-                    eprintln!("🚨 Error processing text message -> {}", e);
-                    eprintln!("🚨 Text Message -> {}", message);
+                    eprintln!("[System] 🚨 Error processing text message -> {}", e);
+                    eprintln!("[System] 🚨 Text Message -> {}", message);
                 }
             }
             Message::Ping(message) => {
-                println!("🏓 Received Ping");
+                println!("[System] 🏓 Received Ping");
                 tx.send(Message::Pong(message)).await.unwrap();
             }
             Message::Pong(_) => {
-                println!("🏓 Received Pong");
+                println!("[System] 🏓 Received Pong");
             }
             Message::Close(_) => {
-                println!("🚪 Connection closed");
+                println!("[System] 🚪 Connection closed");
             }
             Message::Binary(_) => {
-                println!("🔢 Received Binary message");
+                println!("[System] 🔢 Received Binary message");
             }
             Message::Frame(_) => {
-                println!("🖼 Received Frame message");
+                println!("[System] 🖼 Received Frame message");
             }
         }
     }
@@ -170,50 +170,50 @@ impl WebSocketClient {
                 .map_err(|e| format!("🚨 Error sending Pong -> {}", e))?,
 
             Packet::ConnectionAccepted => {
-                println!("🎉 Connection accepted");
+                println!("[System] 🎉 Connection accepted");
             }
             Packet::ConnectionRejected { reason } => {
-                println!("🚨 Connection rejected -> {}", reason);
+                println!("[System] 🚨 Connection rejected -> {}", reason);
             }
 
             Packet::LobbyData(lobby_data) => {
-                println!("🎳 Lobby data received");
+                println!("[System] 🎳 Lobby data received");
                 handle_prepare_to_game(tx, agent, lobby_data).await?
             }
 
             Packet::LobbyDeleted => {
-                println!("🚪 Lobby deleted");
+                println!("[System] 🚪 Lobby deleted");
             }
 
-            Packet::GameStart => println!("🎲 Game started"),
+            Packet::GameStart => println!("[System] 🎲 Game started"),
             Packet::GameState(raw_game_state) => {
                 // println!("🎮 Game state received");
                 handle_next_move(tx, agent, raw_game_state).await?
             }
 
             Packet::GameEnd(game_end) => {
-                println!("🏁 Game ended");
+                println!("[System] 🏁 Game ended");
                 handle_game_ended(agent, game_end).await?
             }
 
             // Warnings
             Packet::PlayerAlreadyMadeActionWarning => {
-                println!("🚨 Player already made action warning");
+                println!("[System] 🚨 Player already made action warning");
             }
             Packet::MissingGameStateIdWarning => {
-                println!("🚨 Missing game state id warning");
+                println!("[System] 🚨 Missing game state id warning");
             }
 
             Packet::SlowResponseWarning => {
-                println!("🚨 Slow response warning");
+                println!("[System] 🚨 Slow response warning");
             }
 
             // Errors
             Packet::InvalidPacketTypeError => {
-                println!("🚨 Client sent an invalid packet type error");
+                println!("[System] 🚨 Client sent an invalid packet type error");
             }
             Packet::InvalidPacketUsageError => {
-                println!("🚨 Client used packet in invalid way");
+                println!("[System] 🚨 Client used packet in invalid way");
             }
 
             // These packets are never send by the server

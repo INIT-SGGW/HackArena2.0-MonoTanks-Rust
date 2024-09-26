@@ -11,17 +11,17 @@ async fn main() {
         debug_quick_join,
     } = Args::parse();
 
-    println!("🚀 Starting client...");
+    println!("[System] 🚀 Starting client...");
     let websocket_client =
         match WebSocketClient::connect(&host, port, &code, &nickname, debug_quick_join).await {
             Ok(client) => client,
             Err(e) => {
-                eprintln!("🌋 Error connecting to the server -> {}", e);
+                eprintln!("[System] 🌋 Error connecting to the server -> {}", e);
                 return;
             }
         };
 
     if let Err(e) = websocket_client.run().await {
-        eprintln!("🌋 Error running WebSocket client -> {}", e);
+        eprintln!("[System] 🌋 Error running WebSocket client -> {}", e);
     }
 }

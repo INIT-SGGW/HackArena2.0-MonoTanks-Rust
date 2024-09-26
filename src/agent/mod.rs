@@ -10,7 +10,7 @@ pub struct Agent {
 }
 
 impl AgentTrait for Agent {
-    fn new(lobby_data: LobbyData) -> Self
+    fn on_joining_lobby(lobby_data: LobbyData) -> Self
     where
         Self: Sized,
     {
@@ -18,6 +18,8 @@ impl AgentTrait for Agent {
             my_id: lobby_data.player_id,
         }
     }
+
+    fn on_lobby_data_changed(&mut self, lobby_data: LobbyData) {}
 
     fn next_move(&mut self, game_state: GameState) -> AgentResponse {
         match rand::random::<f32>() {

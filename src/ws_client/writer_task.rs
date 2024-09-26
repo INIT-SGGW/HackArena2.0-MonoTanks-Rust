@@ -18,7 +18,7 @@ pub fn create_writer_task(
         while let Some(message) = rx.recv().await {
             match write.send(message).await {
                 Ok(_) => {}
-                Err(e) => eprintln!("WebSocket send error: {}", e),
+                Err(e) => eprintln!("[System] 🌋 WebSocket send error: {}", e),
             }
         }
     });
