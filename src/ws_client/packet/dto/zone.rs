@@ -5,15 +5,23 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Constructor)]
 #[serde(rename_all = "camelCase")]
 pub struct Zone {
+    /// The unique index of the zone.
     pub index: u8,
+    /// The x-coordinate of the left side of the zone.
     pub x: u64,
+    /// The y-coordinate of the top side of the zone.
     pub y: u64,
+    /// The width of the zone.
     pub width: u64,
+    /// The height of the zone.
     pub height: u64,
+    /// The current status of the zone.
     pub status: ZoneStatus,
 }
 
 /// Represents the status of a zone.
+///
+/// The status of a zone can be neutral, being captured, captured, being contested, or being retaken.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, IsVariant)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum ZoneStatus {
@@ -34,6 +42,9 @@ pub enum ZoneStatus {
 }
 
 /// Represents the status of a zone being captured.
+///
+/// This struct contains information about the player capturing the zone and the remaining time
+/// until the zone is fully captured.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub struct BeingCapturedStatus {
@@ -44,6 +55,8 @@ pub struct BeingCapturedStatus {
 }
 
 /// Represents the status of a zone that has been captured.
+///
+/// This struct contains information about the player who captured the zone.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub struct CapturedStatus {
@@ -52,6 +65,8 @@ pub struct CapturedStatus {
 }
 
 /// Represents the status of a zone being contested.
+///
+/// This struct contains information about the player who captured the zone, if any.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub struct BeingContestedStatus {
@@ -60,6 +75,9 @@ pub struct BeingContestedStatus {
 }
 
 /// Represents the status of a zone being retaken.
+///
+/// This struct contains information about the remaining time until the zone is retaken,
+/// the player who previously captured the zone, and the player retaking the zone.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub struct BeingRetakenStatus {
