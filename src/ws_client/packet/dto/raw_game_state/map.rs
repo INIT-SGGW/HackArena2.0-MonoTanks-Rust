@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use crate::ws_client::packet::dto::{tile::TilePayload, zone::Zone};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Constructor)]
-pub struct Map {
+pub struct RawMap {
     pub tiles: Vec<Vec<Vec<TilePayload>>>,
     pub zones: Vec<Zone>,
     pub visibility: Vec<String>,

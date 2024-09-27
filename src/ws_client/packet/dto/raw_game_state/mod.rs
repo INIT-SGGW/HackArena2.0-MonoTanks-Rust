@@ -1,7 +1,7 @@
 pub mod map;
 
 use derive_more::derive::Constructor;
-use map::Map;
+use map::RawMap;
 use serde::{Deserialize, Serialize};
 
 use super::player::Player;
@@ -12,5 +12,5 @@ pub struct RawGameState {
     pub id: String,
     pub tick: u64,
     pub players: Vec<Player>,
-    pub map: Map,
+    pub map: RawMap,
 }
