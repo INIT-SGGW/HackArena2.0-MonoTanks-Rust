@@ -1,8 +1,7 @@
-use crate::ws_client::packet::dto::{
-    game_end::GameEnd, game_state::GameState, lobby_data::LobbyData,
-};
-
-use super::agent_response::AgentResponse;
+use crate::ws_client::packet::packets::agent_response::agent_response::AgentResponse;
+use crate::ws_client::packet::packets::game_end::game_end::GameEnd;
+use crate::ws_client::packet::packets::game_state::game_state::GameState;
+use crate::ws_client::packet::packets::lobby_data::LobbyData;
 
 /// A trait that defines the behavior of an agent interacting with the game.
 /// Implementors of this trait must provide logic for how the agent responds

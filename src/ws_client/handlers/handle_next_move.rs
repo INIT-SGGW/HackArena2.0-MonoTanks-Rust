@@ -1,6 +1,6 @@
 use crate::agent::Agent;
-use crate::game::agent_trait::AgentTrait;
-use crate::ws_client::packet::dto::raw_game_state::RawGameState;
+use crate::agent_trait::AgentTrait;
+use crate::ws_client::packet::packets::game_state::raw_game_state::RawGameState;
 use std::sync::Arc;
 use tokio::sync::mpsc::Sender;
 use tokio::sync::Mutex;

@@ -1,8 +1,8 @@
-use super::dto::game_end::GameEnd;
-use super::dto::raw_game_state::RawGameState;
-use super::dto::rotation::Rotation;
-use super::dto::{lobby_data::LobbyData, move_direction::MoveDirection};
-use crate::game::agent_response::AgentResponse;
+use super::packets::agent_response::agent_response::AgentResponse;
+use super::packets::game_state::move_direction::MoveDirection;
+use super::packets::game_state::raw_game_state::RawGameState;
+use super::packets::lobby_data::LobbyData;
+use super::packets::{agent_response::rotation::Rotation, game_end::game_end::GameEnd};
 use crate::ws_client::packet::empty_payload;
 use serde::{Deserialize, Serialize};
 

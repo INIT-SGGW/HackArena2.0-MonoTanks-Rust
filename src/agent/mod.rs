@@ -1,9 +1,10 @@
-use crate::game::agent_response::AgentResponse;
-use crate::game::agent_trait::AgentTrait;
-use crate::ws_client::packet::dto::game_end::GameEnd;
-use crate::ws_client::packet::dto::{
-    game_state::GameState, lobby_data::LobbyData, move_direction::MoveDirection, rotation::Rotation,
-};
+use crate::agent_trait::AgentTrait;
+use crate::ws_client::packet::packets::agent_response::agent_response::AgentResponse;
+use crate::ws_client::packet::packets::agent_response::rotation::Rotation;
+use crate::ws_client::packet::packets::game_end::game_end::GameEnd;
+use crate::ws_client::packet::packets::game_state::game_state::GameState;
+use crate::ws_client::packet::packets::game_state::move_direction::MoveDirection;
+use crate::ws_client::packet::packets::lobby_data::LobbyData;
 
 pub struct Agent {
     my_id: String,
@@ -52,7 +53,7 @@ impl AgentTrait for Agent {
         let winner = game_end
             .players
             .iter()
-            .max_by_key(|player| player.score.unwrap())
+            .max_by_key(|player| player.score)
             .unwrap();
 
         if winner.id == self.my_id {
@@ -60,11 +61,7 @@ impl AgentTrait for Agent {
         }
 
         game_end.players.iter().for_each(|player| {
-            println!(
-                "Player: {} - Score: {}",
-                player.nickname,
-                player.score.unwrap()
-            );
+            println!("Player: {} - Score: {}", player.nickname, player.score);
         });
     }
 }

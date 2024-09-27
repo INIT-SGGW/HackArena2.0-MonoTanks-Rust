@@ -1,4 +1,4 @@
-use super::player::Player;
+use super::game_end_player::GameEndPlayer;
 use derive_more::derive::Constructor;
 use serde::{Deserialize, Serialize};
 
@@ -7,5 +7,5 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct GameEnd {
     /// The list of players at the end of the game.
-    pub players: Vec<Player>,
+    pub players: Vec<GameEndPlayer>,
 }

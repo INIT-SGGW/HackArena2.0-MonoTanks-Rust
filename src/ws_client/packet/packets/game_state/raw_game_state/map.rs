@@ -1,7 +1,6 @@
+use crate::ws_client::packet::packets::game_state::{tile::tile::TilePayload, zone::Zone};
 use derive_more::derive::Constructor;
 use serde::{Deserialize, Serialize};
-
-use crate::ws_client::packet::dto::{tile::TilePayload, zone::Zone};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Constructor)]
 pub struct RawMap {

@@ -1,6 +1,6 @@
 use crate::agent::Agent;
-use crate::game::agent_trait::AgentTrait;
-use crate::ws_client::packet::dto::lobby_data::LobbyData;
+use crate::agent_trait::AgentTrait;
+use crate::ws_client::packet::packets::lobby_data::LobbyData;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio_tungstenite::tungstenite::Message;

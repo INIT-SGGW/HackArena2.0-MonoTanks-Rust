@@ -2,6 +2,6 @@
 #![recursion_limit = "256"]
 
 pub mod agent;
+pub mod agent_trait;
 pub mod args;
-pub mod game;
 pub mod ws_client;

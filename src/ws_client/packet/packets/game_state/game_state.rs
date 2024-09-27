@@ -1,7 +1,7 @@
 use super::{
     player::Player,
     raw_game_state::RawGameState,
-    tile::{Tile, TilePayload},
+    tile::tile::{Tile, TilePayload},
     zone::Zone,
 };
 

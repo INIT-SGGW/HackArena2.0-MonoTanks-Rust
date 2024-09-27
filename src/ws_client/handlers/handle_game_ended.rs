@@ -1,6 +1,6 @@
 use crate::agent::Agent;
-use crate::game::agent_trait::AgentTrait;
-use crate::ws_client::packet::dto::game_end::GameEnd;
+use crate::agent_trait::AgentTrait;
+use crate::ws_client::packet::packets::game_end::game_end::GameEnd;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
