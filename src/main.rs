@@ -1,5 +1,5 @@
 use clap::Parser;
-use hackaton_2024_h2_rust_client::{args::Args, ws_client::ws_client::WebSocketClient};
+use hackathon_2024_h2_rust_client::{args::Args, ws_client::ws_client::WebSocketClient};
 
 #[tokio::main]
 async fn main() {

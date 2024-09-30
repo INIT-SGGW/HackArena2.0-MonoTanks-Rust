@@ -70,7 +70,7 @@ impl WebSocketClient {
         let mut url = format!("ws://{}:{}/?nickname={}", host, port, nickname);
 
         url.push_str("&typeOfPacketType=string");
-        url.push_str("&playerType=hackatonBot");
+        url.push_str("&playerType=hackathonBot");
 
         if !code.is_empty() {
             url.push_str("&joinCode=");

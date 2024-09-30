@@ -29,10 +29,10 @@ RUN cargo build --release --target x86_64-unknown-linux-musl
 FROM scratch
 
 # Copy the static binary from the builder stage
-COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/hackaton_2024_h2_rust_client /app/hackaton_2024_h2_rust_client
+COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/hackathon_2024_h2_rust_client /app/hackathon_2024_h2_rust_client
 
 # Use a non-root user
 USER 1000
 
 # Set the binary as the entry point
-ENTRYPOINT ["/app/hackaton_2024_h2_rust_client"]
+ENTRYPOINT ["/app/hackathon_2024_h2_rust_client"]

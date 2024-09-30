@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'hackaton_2024_h2_rust_client' - Instance 1",
+            "name": "Debug executable 'hackathon_2024_h2_rust_client' - Instance 1",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=hackaton_2024_h2_rust_client",
-                    "--package=hackaton_2024_h2_rust_client"
+                    "--bin=hackathon_2024_h2_rust_client",
+                    "--package=hackathon_2024_h2_rust_client"
                 ],
                 "filter": {
-                    "name": "hackaton_2024_h2_rust_client",
+                    "name": "hackathon_2024_h2_rust_client",
                     "kind": "bin"
                 }
             },
@@ -25,15 +25,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'hackaton_2024_h2_rust_client' - Instance 2",
+            "name": "Debug executable 'hackathon_2024_h2_rust_client' - Instance 2",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=hackaton_2024_h2_rust_client",
-                    "--package=hackaton_2024_h2_rust_client"
+                    "--bin=hackathon_2024_h2_rust_client",
+                    "--package=hackathon_2024_h2_rust_client"
                 ],
                 "filter": {
-                    "name": "hackaton_2024_h2_rust_client",
+                    "name": "hackathon_2024_h2_rust_client",
                     "kind": "bin"
                 }
             },
@@ -43,15 +43,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'hackaton_2024_h2_rust_client' - Instance 3",
+            "name": "Debug executable 'hackathon_2024_h2_rust_client' - Instance 3",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=hackaton_2024_h2_rust_client",
-                    "--package=hackaton_2024_h2_rust_client"
+                    "--bin=hackathon_2024_h2_rust_client",
+                    "--package=hackathon_2024_h2_rust_client"
                 ],
                 "filter": {
-                    "name": "hackaton_2024_h2_rust_client",
+                    "name": "hackathon_2024_h2_rust_client",
                     "kind": "bin"
                 }
             },
@@ -61,16 +61,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in library 'hackaton_2024_h2_rust_client'",
+            "name": "Debug unit tests in library 'hackathon_2024_h2_rust_client'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
                     "--lib",
-                    "--package=hackaton_2024_h2_rust_client"
+                    "--package=hackathon_2024_h2_rust_client"
                 ],
                 "filter": {
-                    "name": "hackaton_2024_h2_rust_client",
+                    "name": "hackathon_2024_h2_rust_client",
                     "kind": "lib"
                 }
             },
@@ -80,16 +80,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'hackaton_2024_h2_rust_client'",
+            "name": "Debug unit tests in executable 'hackathon_2024_h2_rust_client'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=hackaton_2024_h2_rust_client",
-                    "--package=hackaton_2024_h2_rust_client"
+                    "--bin=hackathon_2024_h2_rust_client",
+                    "--package=hackathon_2024_h2_rust_client"
                 ],
                 "filter": {
-                    "name": "hackaton_2024_h2_rust_client",
+                    "name": "hackathon_2024_h2_rust_client",
                     "kind": "bin"
                 }
             },
