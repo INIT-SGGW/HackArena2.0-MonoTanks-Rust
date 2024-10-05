@@ -192,9 +192,11 @@ impl WebSocketClient {
             Packet::MissingGameStateIdWarning => {
                 println!("[System] 🚨 Missing game state id warning");
             }
-
             Packet::SlowResponseWarning => {
                 println!("[System] 🚨 Slow response warning");
+            }
+            Packet::ActionIgnoredDueToDeadWarning => {
+                println!("[System] 🚨 Action ignored due to dead warning");
             }
 
             // Errors

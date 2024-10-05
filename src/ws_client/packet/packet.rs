@@ -60,6 +60,9 @@ pub enum Packet {
     #[serde(with = "empty_payload")]
     SlowResponseWarning,
 
+    #[serde(with = "empty_payload")]
+    ActionIgnoredDueToDeadWarning,
+
     // Errors
     #[serde(with = "empty_payload")]
     InvalidPacketTypeError,
