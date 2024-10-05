@@ -1,5 +1,5 @@
 use super::rotation::Rotation;
-use crate::ws_client::packet::packets::game_state::move_direction::MoveDirection;
+use super::move_direction::MoveDirection;
 
 /// Represents the various responses an agent can have in the system.
 pub enum AgentResponse {

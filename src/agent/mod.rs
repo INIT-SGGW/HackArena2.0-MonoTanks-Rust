@@ -1,9 +1,9 @@
 use crate::agent_trait::AgentTrait;
 use crate::ws_client::packet::packets::agent_response::agent_response::AgentResponse;
+use crate::ws_client::packet::packets::agent_response::move_direction::MoveDirection;
 use crate::ws_client::packet::packets::agent_response::rotation::Rotation;
 use crate::ws_client::packet::packets::game_end::game_end::GameEnd;
 use crate::ws_client::packet::packets::game_state::game_state::GameState;
-use crate::ws_client::packet::packets::game_state::move_direction::MoveDirection;
 use crate::ws_client::packet::packets::lobby_data::LobbyData;
 
 pub struct Agent {

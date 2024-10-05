@@ -1,5 +1,5 @@
 use super::packets::agent_response::agent_response::AgentResponse;
-use super::packets::game_state::move_direction::MoveDirection;
+use super::packets::agent_response::move_direction::MoveDirection;
 use super::packets::game_state::raw_game_state::RawGameState;
 use super::packets::lobby_data::LobbyData;
 use super::packets::{agent_response::rotation::Rotation, game_end::game_end::GameEnd};

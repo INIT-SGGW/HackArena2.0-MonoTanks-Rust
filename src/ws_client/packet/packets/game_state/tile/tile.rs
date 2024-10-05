@@ -26,3 +26,73 @@ pub enum TilePayload {
     /// A tile containing a bullet, where `Bullet` represents the associated bullet data.
     Bullet(Bullet),
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::ws_client::packet::packets::game_state::tile::{direction::Direction, turret::Turret};
+
+    use super::*;
+    use serde_json;
+
+    #[test]
+    fn test_deserialize_wall() {
+        let json_data = r#"{"type": "wall"}"#;
+        let deserialized: TilePayload = serde_json::from_str(json_data).unwrap();
+        assert_eq!(deserialized, TilePayload::Wall);
+    }
+
+    #[test]
+    fn test_deserialize_tank() {
+        let json_data = r#"{
+            "type": "tank",
+            "payload": {
+                "direction": 1,
+                "health": 100,
+                "ownerId": "player1",
+                "turret": {
+                    "bulletCount": 10,
+                    "ticksToRegenBullet": 50,
+                    "direction": 0
+                }
+            }
+        }"#;
+        let deserialized: TilePayload = serde_json::from_str(json_data).unwrap();
+        let expected_tank = Tank {
+            direction: Direction::Right,
+            health: Some(100),
+            owner_id: "player1".to_string(),
+            turret: Turret {
+                bullet_count: Some(10),
+                ticks_to_regen_bullet: Some(50),
+                direction: Direction::Up,
+            },
+        };
+        assert_eq!(deserialized, TilePayload::Tank(expected_tank));
+    }
+
+    #[test]
+    fn test_deserialize_bullet() {
+        let json_data = r#"{
+            "type": "bullet",
+            "payload": {
+                "direction": 2,
+                "id": 1,
+                "speed": 5.0
+            }
+        }"#;
+        let deserialized: TilePayload = serde_json::from_str(json_data).unwrap();
+        let expected_bullet = Bullet {
+            direction: Direction::Down,
+            id: 1,
+            speed: 5.0,
+        };
+        assert_eq!(deserialized, TilePayload::Bullet(expected_bullet));
+    }
+
+    #[test]
+    fn test_deserialize_invalid_type() {
+        let json_data = r#"{"type": "invalid"}"#;
+        let deserialized: Result<TilePayload, _> = serde_json::from_str(json_data);
+        assert!(deserialized.is_err());
+    }
+}
