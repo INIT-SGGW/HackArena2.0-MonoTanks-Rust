@@ -20,7 +20,7 @@ pub struct Agent {
 }
 
 impl AgentTrait for Agent {
-    fn new(lobby_data: LobbyData) -> Self
+    fn on_joining_lobby(lobby_data: LobbyData) -> Self
     where
         Self: Sized,
     {
@@ -29,9 +29,11 @@ impl AgentTrait for Agent {
         }
     }
 
+    fn on_lobby_data_changed(&mut self, lobby_data: LobbyData) {}
+
     fn next_move(&mut self, game_state: GameState) -> AgentResponse {
         match rand::random::<f32>() {
-            r if r < 0.33 => {
+            r if r < 0.25 => {
                 let direction = if rand::random::<bool>() {
                     MoveDirection::Forward
                 } else {
@@ -40,7 +42,7 @@ impl AgentTrait for Agent {
 
                 AgentResponse::TankMovement { direction }
             }
-            r if r < 0.66 => {
+            r if r < 0.50 => {
                 let random_rotation = || match rand::random::<f32>() {
                     r if r < 0.33 => Some(Rotation::Left),
                     r if r < 0.66 => Some(Rotation::Right),
@@ -52,7 +54,8 @@ impl AgentTrait for Agent {
                     turret_rotation: random_rotation(),
                 }
             }
-            _ => AgentResponse::TankShoot,
+            r if r < 0.75 => AgentResponse::TankShoot,
+            _ => AgentResponse::ResponsePass,
         }
     }
 
@@ -60,7 +63,7 @@ impl AgentTrait for Agent {
         let winner = game_end
             .players
             .iter()
-            .max_by_key(|player| player.score.unwrap())
+            .max_by_key(|player| player.score)
             .unwrap();
 
         if winner.id == self.my_id {
@@ -68,11 +71,7 @@ impl AgentTrait for Agent {
         }
 
         game_end.players.iter().for_each(|player| {
-            println!(
-                "Player: {} - Score: {}",
-                player.nickname,
-                player.score.unwrap()
-            );
+            println!("Player: {} - Score: {}", player.nickname, player.score);
         });
     }
 }
