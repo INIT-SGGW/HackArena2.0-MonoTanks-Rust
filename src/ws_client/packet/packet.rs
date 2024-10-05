@@ -48,6 +48,11 @@ pub enum Packet {
         game_state_id: String,
     },
 
+    #[serde(rename_all = "camelCase")]
+    ResponsePass {
+        game_state_id: String,
+    },
+
     GameEnd(GameEnd),
 
     // Warnings
@@ -93,6 +98,7 @@ impl AgentResponse {
                 turret_rotation,
             },
             AgentResponse::TankShoot => Packet::TankShoot { game_state_id },
+            AgentResponse::ResponsePass => Packet::ResponsePass { game_state_id },
         }
     }
 }

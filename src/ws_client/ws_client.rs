@@ -211,7 +211,8 @@ impl WebSocketClient {
             Packet::Pong
             | Packet::TankMovement { .. }
             | Packet::TankRotation { .. }
-            | Packet::TankShoot { .. } => {
+            | Packet::TankShoot { .. } 
+            | Packet::ResponsePass { .. } => {
                 unreachable!()
             }
         };

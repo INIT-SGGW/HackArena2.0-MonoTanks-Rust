@@ -23,4 +23,8 @@ pub enum AgentResponse {
     ///
     /// This variant indicates that the tank's turret should shoot a bullet.
     TankShoot,
+
+    /// Represents a pass action, where the agent chooses to do nothing.
+    /// It is useful when the agent want to wait on a site or when it is dead.
+    ResponsePass,
 }

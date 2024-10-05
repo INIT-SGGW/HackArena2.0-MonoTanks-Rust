@@ -24,7 +24,7 @@ impl AgentTrait for Agent {
 
     fn next_move(&mut self, game_state: GameState) -> AgentResponse {
         match rand::random::<f32>() {
-            r if r < 0.33 => {
+            r if r < 0.25 => {
                 let direction = if rand::random::<bool>() {
                     MoveDirection::Forward
                 } else {
@@ -33,7 +33,7 @@ impl AgentTrait for Agent {
 
                 AgentResponse::TankMovement { direction }
             }
-            r if r < 0.66 => {
+            r if r < 0.50 => {
                 let random_rotation = || match rand::random::<f32>() {
                     r if r < 0.33 => Some(Rotation::Left),
                     r if r < 0.66 => Some(Rotation::Right),
@@ -45,7 +45,8 @@ impl AgentTrait for Agent {
                     turret_rotation: random_rotation(),
                 }
             }
-            _ => AgentResponse::TankShoot,
+            r if r < 0.75 => AgentResponse::TankShoot,
+            _ => AgentResponse::ResponsePass,
         }
     }
 
