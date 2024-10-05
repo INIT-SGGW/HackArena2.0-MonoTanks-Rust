@@ -14,8 +14,8 @@ pub struct Player {
     /// Represents the player's color, used in visual representation as a color for nickname and tank.
     pub color: u64,
 
-    /// The player's current ping, representing latency, if available.
-    pub ping: Option<u64>,
+    /// The player's current ping in milliseconds, representing latency.
+    pub ping: u64,
 
     /// The player's score in the game, if available.
     pub score: Option<u64>,
