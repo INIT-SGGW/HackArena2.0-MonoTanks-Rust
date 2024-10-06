@@ -92,6 +92,12 @@ impl AgentResponse {
             AgentResponse::TankRotation {
                 tank_rotation,
                 turret_rotation,
+            } if tank_rotation.is_none() && turret_rotation.is_none() => {
+                Packet::ResponsePass { game_state_id }
+            }
+            AgentResponse::TankRotation {
+                tank_rotation,
+                turret_rotation,
             } => Packet::TankRotation {
                 game_state_id,
                 tank_rotation,

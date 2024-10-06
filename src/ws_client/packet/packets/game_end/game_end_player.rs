@@ -16,4 +16,7 @@ pub struct GameEndPlayer {
 
     /// The player's final score in the game.
     pub score: u64,
+
+    /// The number of kills the player achieved.
+    pub kills: u64,
 }
