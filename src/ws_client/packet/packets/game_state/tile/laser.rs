@@ -1,5 +1,4 @@
 use derive_more::derive::{Constructor, IsVariant};
-use num_enum::{IntoPrimitive, TryFromPrimitive};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Constructor)]
@@ -11,8 +10,6 @@ pub struct Laser {
 
 #[derive(
     Debug,
-    IntoPrimitive,
-    TryFromPrimitive,
     Clone,
     Copy,
     PartialEq,
@@ -23,8 +20,6 @@ pub struct Laser {
     Deserialize,
 )]
 #[serde(rename_all = "camelCase")]
-#[serde(into = "u64", try_from = "u64")]
-#[repr(u64)]
 pub enum LaserOrientation {
     Horizontal,
     Vertical,

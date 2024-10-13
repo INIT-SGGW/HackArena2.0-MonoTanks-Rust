@@ -1,12 +1,9 @@
 use derive_more::derive::IsVariant;
-use num_enum::{IntoPrimitive, TryFromPrimitive};
 use serde::{Deserialize, Serialize};
 
 /// Represents the four cardinal directions.
 #[derive(
     Debug,
-    IntoPrimitive,
-    TryFromPrimitive,
     Clone,
     Copy,
     PartialEq,
@@ -17,20 +14,18 @@ use serde::{Deserialize, Serialize};
     Deserialize,
 )]
 #[serde(rename_all = "camelCase")]
-#[serde(into = "u64", try_from = "u64")]
-#[repr(u64)]
 pub enum Direction {
     /// Represents upward direction.
-    Up = 0,
+    Up,
 
     /// Represents rightward direction.
-    Right = 1,
+    Right,
 
     /// Represents downward direction.
-    Down = 2,
+    Down,
 
     /// Represents leftward direction.
-    Left = 3,
+    Left,
 }
 
 #[cfg(test)]
@@ -42,31 +37,32 @@ mod tests {
     fn test_serialize() {
         let direction = Direction::Up;
         let serialized = serde_json::to_string(&direction).unwrap();
-        assert_eq!(serialized, "0");
+        assert_eq!(serialized, "\"up\"");
     }
 
     #[test]
     fn test_deserialize() {
-        let deserialized: Direction = serde_json::from_str("1").unwrap();
+        let deserialized: Direction = serde_json::from_str("\"right\"").unwrap();
         assert_eq!(deserialized, Direction::Right);
     }
 
     #[test]
+    fn test_deserialize_all_variants() {
+        assert_eq!(serde_json::from_str::<Direction>("\"up\"").unwrap(), Direction::Up);
+        assert_eq!(serde_json::from_str::<Direction>("\"right\"").unwrap(), Direction::Right);
+        assert_eq!(serde_json::from_str::<Direction>("\"down\"").unwrap(), Direction::Down);
+        assert_eq!(serde_json::from_str::<Direction>("\"left\"").unwrap(), Direction::Left);
+    }
+
+    #[test]
     fn test_deserialize_invalid() {
-        let deserialized: Result<Direction, _> = serde_json::from_str("4");
+        let deserialized: Result<Direction, _> = serde_json::from_str("\"invalid\"");
         assert!(deserialized.is_err());
     }
 
     #[test]
     fn test_deserialize_invalid_type() {
-        let deserialized: Result<Direction, _> = serde_json::from_str("\"1\"");
-        assert!(deserialized.is_err());
-    }
-
-    #[test]
-    fn test_deserialize_invalid_type2() {
-        // It should be a number
-        let deserialized: Result<Direction, _> = serde_json::from_str("Up");
+        let deserialized: Result<Direction, _> = serde_json::from_str("1");
         assert!(deserialized.is_err());
     }
 }

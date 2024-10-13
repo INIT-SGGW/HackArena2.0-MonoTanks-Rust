@@ -49,15 +49,15 @@ mod tests {
         let json_data = r#"{
             "type": "tank",
             "payload": {
-                "direction": 1,
+                "direction": "right",
                 "health": 100,
                 "ownerId": "player1",
                 "turret": {
                     "bulletCount": 10,
                     "ticksToRegenBullet": 50,
-                    "direction": 0
+                    "direction": "up"
                 },
-                "secondaryItem": 3
+                "secondaryItem": "radar"
             }
         }"#;
         let deserialized: TilePayload = serde_json::from_str(json_data).unwrap();
@@ -80,10 +80,10 @@ mod tests {
         let json_data = r#"{
             "type": "bullet",
             "payload": {
-                "direction": 2,
+                "direction": "down",
                 "id": 1,
                 "speed": 5.0,
-                "type": "bullet"
+                "type": "basic"
             }
         }"#;
         let deserialized: TilePayload = serde_json::from_str(json_data).unwrap();
@@ -91,7 +91,7 @@ mod tests {
             direction: Direction::Down,
             id: 1,
             speed: 5.0,
-            bullet_type: BulletType::Bullet,
+            bullet_type: BulletType::Basic,
         };
         assert_eq!(deserialized, TilePayload::Bullet(expected_bullet));
     }
@@ -102,7 +102,7 @@ mod tests {
             "type": "laser",
             "payload": {
                 "id": 1,
-                "orientation": 0
+                "orientation": "horizontal"
             }
         }"#;
         let deserialized: TilePayload = serde_json::from_str(json_data).unwrap();
@@ -142,7 +142,7 @@ mod tests {
         let json_data = r#"{
             "type": "item",
             "payload": {
-                "type": 3
+                "type": "radar"
             }
         }"#;
         let deserialized: TilePayload = serde_json::from_str(json_data).unwrap();

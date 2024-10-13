@@ -69,7 +69,7 @@ impl WebSocketClient {
     pub fn construct_url(host: &str, port: u16, code: &str, nickname: &str) -> String {
         let mut url = format!("ws://{}:{}/?nickname={}", host, port, nickname);
 
-        url.push_str("&typeOfPacketType=string");
+        url.push_str("&enumSerializationFormat=string");
         url.push_str("&playerType=hackathonBot");
 
         if !code.is_empty() {
