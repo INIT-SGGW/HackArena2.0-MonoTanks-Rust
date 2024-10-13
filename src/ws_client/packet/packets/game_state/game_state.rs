@@ -1,9 +1,4 @@
-use super::{
-    player::Player,
-    raw_game_state::RawGameState,
-    tile::tile::{Tile, TilePayload},
-    zone::Zone,
-};
+use super::{player::Player, raw_game_state::RawGameState, tile::tile::Tile, zone::Zone};
 
 use derive_more::Constructor;
 
@@ -28,13 +23,13 @@ impl From<RawGameState> for GameState {
         let x = raw_game_state.map.tiles.len();
         let y = raw_game_state.map.tiles[0].len();
 
-        let mut map = vec![vec![Tile::new(false, None, TilePayload::Empty); x]; y];
+        let mut map = vec![vec![Tile::new(false, None, vec![]); x]; y];
 
         // Payload
         for (x, column) in raw_game_state.map.tiles.iter().enumerate() {
             for (y, row) in column.iter().enumerate() {
                 if !row.is_empty() {
-                    map[y][x].payload = row[0].clone();
+                    map[y][x].objects = row.clone();
                 }
             }
         }

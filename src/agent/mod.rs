@@ -1,9 +1,11 @@
 use crate::agent_trait::AgentTrait;
+use crate::ws_client::packet::packets::agent_response::ability_type::AbilityType;
 use crate::ws_client::packet::packets::agent_response::agent_response::AgentResponse;
 use crate::ws_client::packet::packets::agent_response::move_direction::MoveDirection;
 use crate::ws_client::packet::packets::agent_response::rotation::Rotation;
 use crate::ws_client::packet::packets::game_end::game_end::GameEnd;
 use crate::ws_client::packet::packets::game_state::game_state::GameState;
+use crate::ws_client::packet::packets::game_state::tile::tile::TilePayload;
 use crate::ws_client::packet::packets::lobby_data::LobbyData;
 
 pub struct Agent {
@@ -23,6 +25,22 @@ impl AgentTrait for Agent {
     fn on_lobby_data_changed(&mut self, lobby_data: LobbyData) {}
 
     fn next_move(&mut self, game_state: GameState) -> AgentResponse {
+        let my_tank = game_state
+            .map
+            .iter()
+            .flatten()
+            .find(|tile| tile.objects.iter().any(|obj| {
+                if let TilePayload::Tank(tank) = obj {
+                    tank.owner_id == self.my_id
+                } else {
+                    false
+                }
+            }));
+
+        if my_tank.is_none() {
+            return AgentResponse::Pass;
+        }
+
         match rand::random::<f32>() {
             r if r < 0.25 => {
                 let direction = if rand::random::<bool>() {
@@ -31,7 +49,7 @@ impl AgentTrait for Agent {
                     MoveDirection::Backward
                 };
 
-                AgentResponse::TankMovement { direction }
+                AgentResponse::Movement { direction }
             }
             r if r < 0.50 => {
                 let random_rotation = || match rand::random::<f32>() {
@@ -40,13 +58,13 @@ impl AgentTrait for Agent {
                     _ => None,
                 };
 
-                AgentResponse::TankRotation {
+                AgentResponse::Rotation {
                     tank_rotation: random_rotation(),
                     turret_rotation: random_rotation(),
                 }
             }
-            r if r < 0.75 => AgentResponse::TankShoot,
-            _ => AgentResponse::ResponsePass,
+            r if r < 0.75 => AgentResponse::AbilityUse { ability_type: AbilityType::FireBullet },
+            _ => AgentResponse::Pass,
         }
     }
 

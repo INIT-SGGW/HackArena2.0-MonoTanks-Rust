@@ -199,6 +199,10 @@ impl WebSocketClient {
                 println!("[System] 🚨 Action ignored due to dead warning");
             }
 
+            Packet::CustomWarning { message } => {
+                println!("[System] 🚨 Warning -> {}", message);
+            }
+
             // Errors
             Packet::InvalidPacketTypeError => {
                 println!("[System] 🚨 Client sent an invalid packet type error");
@@ -209,10 +213,10 @@ impl WebSocketClient {
 
             // These packets are never send by the server
             Packet::Pong
-            | Packet::TankMovement { .. }
-            | Packet::TankRotation { .. }
-            | Packet::TankShoot { .. } 
-            | Packet::ResponsePass { .. } => {
+            | Packet::Movement { .. }
+            | Packet::Rotation { .. }
+            | Packet::AbilityUse { .. }
+            | Packet::Pass { .. } => {
                 unreachable!()
             }
         };

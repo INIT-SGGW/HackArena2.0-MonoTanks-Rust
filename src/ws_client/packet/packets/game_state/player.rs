@@ -22,4 +22,7 @@ pub struct Player {
 
     /// Number of ticks (time units) remaining until the player's health or resource regenerates, if applicable. This is when player is dead.
     pub ticks_to_regen: Option<u64>,
+
+    /// Indicates whether the player is currently using radar. This is visible only for yourself.
+    pub is_using_radar: Option<bool>,
 }

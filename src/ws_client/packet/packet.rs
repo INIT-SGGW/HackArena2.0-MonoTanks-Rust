@@ -1,3 +1,4 @@
+use super::packets::agent_response::ability_type::AbilityType;
 use super::packets::agent_response::agent_response::AgentResponse;
 use super::packets::agent_response::move_direction::MoveDirection;
 use super::packets::game_state::raw_game_state::RawGameState;
@@ -31,25 +32,26 @@ pub enum Packet {
     GameState(RawGameState),
 
     #[serde(rename_all = "camelCase")]
-    TankMovement {
+    Movement {
         game_state_id: String,
         direction: MoveDirection,
     },
 
     #[serde(rename_all = "camelCase")]
-    TankRotation {
+    Rotation {
         game_state_id: String,
         tank_rotation: Option<Rotation>,
         turret_rotation: Option<Rotation>,
     },
 
     #[serde(rename_all = "camelCase")]
-    TankShoot {
+    AbilityUse {
         game_state_id: String,
+        ability_type: AbilityType,
     },
 
     #[serde(rename_all = "camelCase")]
-    ResponsePass {
+    Pass {
         game_state_id: String,
     },
 
@@ -68,6 +70,10 @@ pub enum Packet {
     #[serde(with = "empty_payload")]
     ActionIgnoredDueToDeadWarning,
 
+    CustomWarning {
+        message: String,
+    },
+
     // Errors
     #[serde(with = "empty_payload")]
     InvalidPacketTypeError,
@@ -85,26 +91,26 @@ impl From<Packet> for String {
 impl AgentResponse {
     pub fn to_packet(self, game_state_id: String) -> Packet {
         match self {
-            AgentResponse::TankMovement { direction } => Packet::TankMovement {
+            AgentResponse::Movement { direction } => Packet::Movement {
                 game_state_id,
                 direction,
             },
-            AgentResponse::TankRotation {
+            AgentResponse::Rotation {
                 tank_rotation,
                 turret_rotation,
             } if tank_rotation.is_none() && turret_rotation.is_none() => {
-                Packet::ResponsePass { game_state_id }
+                Packet::Pass { game_state_id }
             }
-            AgentResponse::TankRotation {
+            AgentResponse::Rotation {
                 tank_rotation,
                 turret_rotation,
-            } => Packet::TankRotation {
+            } => Packet::Rotation {
                 game_state_id,
                 tank_rotation,
                 turret_rotation,
             },
-            AgentResponse::TankShoot => Packet::TankShoot { game_state_id },
-            AgentResponse::ResponsePass => Packet::ResponsePass { game_state_id },
+            AgentResponse::AbilityUse { ability_type } => Packet::AbilityUse { game_state_id, ability_type },
+            AgentResponse::Pass => Packet::Pass { game_state_id },
         }
     }
 }

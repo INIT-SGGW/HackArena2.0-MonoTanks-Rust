@@ -1,4 +1,5 @@
 use super::{direction::Direction, turret::Turret};
+use crate::ws_client::packet::packets::game_state::tile::item::ItemType;
 use derive_more::derive::Constructor;
 use serde::{Deserialize, Serialize};
 
@@ -18,4 +19,7 @@ pub struct Tank {
 
     /// The turret attached to the tank.
     pub turret: Turret,
+
+    /// The secondary item the tank is holding. This field is only Some for your own tank.
+    pub secondary_item: Option<ItemType>,
 }
