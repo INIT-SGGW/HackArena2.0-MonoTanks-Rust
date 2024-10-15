@@ -6,7 +6,7 @@ use crate::ws_client::packet::packets::agent_response::move_direction::MoveDirec
 use crate::ws_client::packet::packets::agent_response::rotation::Rotation;
 use crate::ws_client::packet::packets::game_end::game_end::GameEnd;
 use crate::ws_client::packet::packets::game_state::game_state::GameState;
-use crate::ws_client::packet::packets::game_state::tile::tile::TilePayload;
+use crate::ws_client::packet::packets::game_state::tile::tile::TileEntity;
 use crate::ws_client::packet::packets::lobby_data::LobbyData;
 
 pub struct Agent {
@@ -29,8 +29,8 @@ impl AgentTrait for Agent {
 
     fn next_move(&mut self, game_state: GameState) -> AgentResponse {
         let my_tank = game_state.map.iter().flatten().find(|tile| {
-            tile.objects.iter().any(|obj| {
-                if let TilePayload::Tank(tank) = obj {
+            tile.entities.iter().any(|obj| {
+                if let TileEntity::Tank(tank) = obj {
                     tank.owner_id == self.my_id
                 } else {
                     false

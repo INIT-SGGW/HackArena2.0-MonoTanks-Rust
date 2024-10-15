@@ -1,4 +1,4 @@
-use super::{bullet::Bullet, laser::Laser, mine::Mine, tank::Tank, item::Item};
+use super::{bullet::Bullet, item::Item, laser::Laser, mine::Mine, tank::Tank};
 use derive_more::derive::{Constructor, IsVariant};
 use serde::{Deserialize, Serialize};
 
@@ -9,14 +9,14 @@ pub struct Tile {
     pub visible: bool,
     /// If tile is in a zone, this is the index of the zone it belongs to.
     pub zone_index: Option<u8>,
-    /// The specific payload of the tile, determining its content (e.g., empty, wall, tank, bullet).
-    pub objects: Vec<TilePayload>,
+    /// The specific entities on the tile, determining its content (e.g., empty, wall, tank, bullet).
+    pub entities: Vec<TileEntity>,
 }
 
-/// Enum representing the possible contents (payloads) of a tile.
+/// Enum representing the possible entities (contents) of a tile.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, IsVariant)]
 #[serde(tag = "type", content = "payload", rename_all = "camelCase")]
-pub enum TilePayload {
+pub enum TileEntity {
     /// Represents a tile containing a wall.
     Wall,
     /// A tile containing a tank, where `Tank` represents the associated tank data.
@@ -33,15 +33,18 @@ pub enum TilePayload {
 
 #[cfg(test)]
 mod tests {
-    use crate::ws_client::packet::packets::game_state::tile::{bullet::BulletType, direction::Direction, item::ItemType, laser::LaserOrientation, tank::Tank, turret::Turret};
     use super::*;
+    use crate::ws_client::packet::packets::game_state::tile::{
+        bullet::BulletType, direction::Direction, item::ItemType, laser::LaserOrientation,
+        tank::Tank, turret::Turret,
+    };
     use serde_json;
 
     #[test]
     fn test_deserialize_wall() {
         let json_data = r#"{"type": "wall"}"#;
-        let deserialized: TilePayload = serde_json::from_str(json_data).unwrap();
-        assert_eq!(deserialized, TilePayload::Wall);
+        let deserialized: TileEntity = serde_json::from_str(json_data).unwrap();
+        assert_eq!(deserialized, TileEntity::Wall);
     }
 
     #[test]
@@ -60,7 +63,7 @@ mod tests {
                 "secondaryItem": "radar"
             }
         }"#;
-        let deserialized: TilePayload = serde_json::from_str(json_data).unwrap();
+        let deserialized: TileEntity = serde_json::from_str(json_data).unwrap();
         let expected_tank = Tank {
             direction: Direction::Right,
             health: Some(100),
@@ -72,7 +75,7 @@ mod tests {
             },
             secondary_item: Some(ItemType::Radar),
         };
-        assert_eq!(deserialized, TilePayload::Tank(expected_tank));
+        assert_eq!(deserialized, TileEntity::Tank(expected_tank));
     }
 
     #[test]
@@ -86,14 +89,14 @@ mod tests {
                 "type": "basic"
             }
         }"#;
-        let deserialized: TilePayload = serde_json::from_str(json_data).unwrap();
+        let deserialized: TileEntity = serde_json::from_str(json_data).unwrap();
         let expected_bullet = Bullet {
             direction: Direction::Down,
             id: 1,
             speed: 5.0,
             bullet_type: BulletType::Basic,
         };
-        assert_eq!(deserialized, TilePayload::Bullet(expected_bullet));
+        assert_eq!(deserialized, TileEntity::Bullet(expected_bullet));
     }
 
     #[test]
@@ -105,12 +108,12 @@ mod tests {
                 "orientation": "horizontal"
             }
         }"#;
-        let deserialized: TilePayload = serde_json::from_str(json_data).unwrap();
+        let deserialized: TileEntity = serde_json::from_str(json_data).unwrap();
         let expected_laser = Laser {
             id: 1,
             orientation: LaserOrientation::Horizontal,
         };
-        assert_eq!(deserialized, TilePayload::Laser(expected_laser));
+        assert_eq!(deserialized, TileEntity::Laser(expected_laser));
     }
 
     #[test]
@@ -122,18 +125,18 @@ mod tests {
                 "explosionRemainingTicks": 50
             }
         }"#;
-        let deserialized: TilePayload = serde_json::from_str(json_data).unwrap();
+        let deserialized: TileEntity = serde_json::from_str(json_data).unwrap();
         let expected_mine = Mine {
             id: 1,
             explosion_remaining_ticks: Some(50),
         };
-        assert_eq!(deserialized, TilePayload::Mine(expected_mine));
+        assert_eq!(deserialized, TileEntity::Mine(expected_mine));
     }
 
     #[test]
     fn test_deserialize_invalid_type() {
         let json_data = r#"{"type": "invalid"}"#;
-        let deserialized: Result<TilePayload, _> = serde_json::from_str(json_data);
+        let deserialized: Result<TileEntity, _> = serde_json::from_str(json_data);
         assert!(deserialized.is_err());
     }
 
@@ -145,10 +148,10 @@ mod tests {
                 "type": "radar"
             }
         }"#;
-        let deserialized: TilePayload = serde_json::from_str(json_data).unwrap();
+        let deserialized: TileEntity = serde_json::from_str(json_data).unwrap();
         let expected_item = Item {
             item_type: ItemType::Radar,
         };
-        assert_eq!(deserialized, TilePayload::Item(expected_item));
+        assert_eq!(deserialized, TileEntity::Item(expected_item));
     }
 }

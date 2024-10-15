@@ -29,7 +29,7 @@ impl From<RawGameState> for GameState {
         for (x, column) in raw_game_state.map.tiles.iter().enumerate() {
             for (y, row) in column.iter().enumerate() {
                 if !row.is_empty() {
-                    map[y][x].objects = row.clone();
+                    map[y][x].entities = row.clone();
                 }
             }
         }
