@@ -15,7 +15,7 @@ pub struct Bullet {
     /// The speed of the bullet, indicating how fast it moves. Its unit is tiles per second.
     pub speed: f64,
 
-    /// The type of the bullet, either "bullet" or "doubleBullet".
+    /// The type of the bullet.
     #[serde(rename = "type")]
     pub bullet_type: BulletType,
 }

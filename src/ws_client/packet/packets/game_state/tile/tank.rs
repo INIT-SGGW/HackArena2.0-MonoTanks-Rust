@@ -20,6 +20,7 @@ pub struct Tank {
     /// The turret attached to the tank.
     pub turret: Turret,
 
-    /// The secondary item the tank is holding. This field is only Some for your own tank.
+    /// The secondary item the tank is holding. This field is None for other tanks.
+    /// It can also be None for your own tank if you have no secondary item.
     pub secondary_item: Option<ItemType>,
 }
