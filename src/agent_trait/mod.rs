@@ -1,3 +1,4 @@
+use crate::ws_client::packet::packet::Warning;
 use crate::ws_client::packet::packets::agent_response::agent_response::AgentResponse;
 use crate::ws_client::packet::packets::game_end::game_end::GameEnd;
 use crate::ws_client::packet::packets::game_state::game_state::GameState;
@@ -52,6 +53,16 @@ pub trait AgentTrait: Send + Sync {
     /// - `AgentResponse`: The action or decision made by the agent, which will
     ///   be communicated back to the game server.
     fn next_move(&mut self, game_state: GameState) -> AgentResponse;
+
+    /// Called when a warning is received from the server.
+    /// Please, do remember that if you agent is stuck on processing warning,
+    /// the next move won't be called and vice versa.
+    ///
+    /// # Parameters
+    /// - `warning`: The warning received from the server.
+    fn on_warning_received(&mut self, warning: Warning) {
+        let _ = warning;
+    }
 
     /// Called when the game has concluded, providing the final game results.
     ///

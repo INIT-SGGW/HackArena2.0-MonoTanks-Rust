@@ -1,4 +1,5 @@
 use crate::agent_trait::AgentTrait;
+use crate::ws_client::packet::packet::Warning;
 use crate::ws_client::packet::packets::agent_response::ability_type::AbilityType;
 use crate::ws_client::packet::packets::agent_response::agent_response::AgentResponse;
 use crate::ws_client::packet::packets::agent_response::move_direction::MoveDirection;
@@ -22,20 +23,20 @@ impl AgentTrait for Agent {
         }
     }
 
-    fn on_lobby_data_changed(&mut self, lobby_data: LobbyData) {}
+    fn on_lobby_data_changed(&mut self, lobby_data: LobbyData) {
+        let _ = lobby_data;
+    }
 
     fn next_move(&mut self, game_state: GameState) -> AgentResponse {
-        let my_tank = game_state
-            .map
-            .iter()
-            .flatten()
-            .find(|tile| tile.objects.iter().any(|obj| {
+        let my_tank = game_state.map.iter().flatten().find(|tile| {
+            tile.objects.iter().any(|obj| {
                 if let TilePayload::Tank(tank) = obj {
                     tank.owner_id == self.my_id
                 } else {
                     false
                 }
-            }));
+            })
+        });
 
         if my_tank.is_none() {
             return AgentResponse::Pass;
@@ -63,8 +64,24 @@ impl AgentTrait for Agent {
                     turret_rotation: random_rotation(),
                 }
             }
-            r if r < 0.75 => AgentResponse::AbilityUse { ability_type: AbilityType::FireBullet },
+            r if r < 0.75 => AgentResponse::AbilityUse {
+                ability_type: AbilityType::FireBullet,
+            },
             _ => AgentResponse::Pass,
+        }
+    }
+
+    fn on_warning_received(&mut self, warning: Warning) {
+        match warning {
+            Warning::PlayerAlreadyMadeActionWarning => {
+                println!("⚠️ Player already made action warning")
+            }
+            Warning::MissingGameStateIdWarning => println!("⚠️ Missing game state id warning"),
+            Warning::SlowResponseWarning => println!("⚠️ Slow response warning"),
+            Warning::ActionIgnoredDueToDeadWarning => {
+                println!("⚠️ Action ignored due to dead warning")
+            }
+            Warning::CustomWarning { message } => println!("⚠️ Custom warning: {}", message),
         }
     }
 

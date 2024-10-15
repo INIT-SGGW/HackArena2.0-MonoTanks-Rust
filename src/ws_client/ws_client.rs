@@ -13,6 +13,7 @@ use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, Web
 
 use super::handlers::handle_game_ended::handle_game_ended;
 use super::handlers::handle_next_move::handle_next_move;
+use super::handlers::handle_on_warning_received::handle_on_warning_received;
 use super::handlers::handle_prepare_to_game::handle_prepare_to_game;
 use super::packet::packet::Packet;
 
@@ -186,22 +187,7 @@ impl WebSocketClient {
             }
 
             // Warnings
-            Packet::PlayerAlreadyMadeActionWarning => {
-                println!("[System] 🚨 Player already made action warning");
-            }
-            Packet::MissingGameStateIdWarning => {
-                println!("[System] 🚨 Missing game state id warning");
-            }
-            Packet::SlowResponseWarning => {
-                println!("[System] 🚨 Slow response warning");
-            }
-            Packet::ActionIgnoredDueToDeadWarning => {
-                println!("[System] 🚨 Action ignored due to dead warning");
-            }
-
-            Packet::CustomWarning { message } => {
-                println!("[System] 🚨 Warning -> {}", message);
-            }
+            Packet::Warning(warning) => handle_on_warning_received(agent, warning).await?,
 
             // Errors
             Packet::InvalidPacketTypeError => {
