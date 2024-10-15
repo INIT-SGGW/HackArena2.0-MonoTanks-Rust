@@ -55,7 +55,7 @@ impl AgentTrait for Agent {
                     } else if entities.iter().any(|entity| entity.is_item()) {
                         'I'
                     } else if col.visible {
-                        '*'
+                        '.'
                     } else if col.zone_index.is_some() {
                         col.zone_index.unwrap() as char
                     } else {
