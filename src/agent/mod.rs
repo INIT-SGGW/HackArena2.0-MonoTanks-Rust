@@ -28,6 +28,47 @@ impl AgentTrait for Agent {
     }
 
     fn next_move(&mut self, game_state: GameState) -> AgentResponse {
+        // Print map as ascii
+        println!("Map:");
+        for row in game_state.map.iter() {
+            for col in row.iter() {
+                let entities = &col.entities;
+                let symbol = {
+                    if entities.iter().any(|entity| entity.is_wall()) {
+                        '#'
+                    } else if entities.iter().any(|entity| {
+                        if let TileEntity::Tank(tank) = entity {
+                            tank.owner_id == self.my_id
+                        } else {
+                            false
+                        }
+                    }) {
+                        'T'
+                    } else if entities.iter().any(|entity| entity.is_tank()) {
+                        't'
+                    } else if entities.iter().any(|entity| entity.is_bullet()) {
+                        'B'
+                    } else if entities.iter().any(|entity| entity.is_laser()) {
+                        'L'
+                    } else if entities.iter().any(|entity| entity.is_mine()) {
+                        'M'
+                    } else if entities.iter().any(|entity| entity.is_item()) {
+                        'I'
+                    } else if col.visible {
+                        '*'
+                    } else if col.zone_index.is_some() {
+                        col.zone_index.unwrap() as char
+                    } else {
+                        ' '
+                    }
+                };
+
+                print!(" {}", symbol);
+            }
+            println!();
+        }
+
+        // Find my tank
         let my_tank = game_state.map.iter().flatten().find(|tile| {
             tile.entities.iter().any(|obj| {
                 if let TileEntity::Tank(tank) = obj {
@@ -38,10 +79,12 @@ impl AgentTrait for Agent {
             })
         });
 
+        // If our tank is not found, it is dead, and we should pass
         if my_tank.is_none() {
             return AgentResponse::Pass;
         }
 
+        // Do a random action
         match rand::random::<f32>() {
             r if r < 0.25 => {
                 let direction = if rand::random::<bool>() {
