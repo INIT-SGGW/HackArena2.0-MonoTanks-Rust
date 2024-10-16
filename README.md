@@ -278,7 +278,9 @@ Steps:
    - Searching for and selecting `>Dev Containers: Reopen in Container`
 
 Once the container is running, you can execute all necessary commands in VS
-Code's integrated terminal, as if you were running the project locally.
+Code's integrated terminal, as if you were running the project locally. However,
+if server is running on your local machine, you should use `host.docker.internal`
+as a host.
 
 ### 3. Running in a Docker Container (Manual Setup)
 
