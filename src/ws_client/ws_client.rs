@@ -12,6 +12,7 @@ use tokio_tungstenite::tungstenite::Error;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
 use super::handlers::handle_game_ended::handle_game_ended;
+use super::handlers::handle_game_starting::handle_game_starting;
 use super::handlers::handle_next_move::handle_next_move;
 use super::handlers::handle_on_warning_received::handle_on_warning_received;
 use super::handlers::handle_prepare_to_game::handle_prepare_to_game;
@@ -175,7 +176,7 @@ impl WebSocketClient {
                 println!("[System] 🚪 Lobby deleted");
             }
 
-            Packet::GameStart => println!("[System] 🎲 Game started"),
+            Packet::GameStarted => println!("[System] 🎲 Game started"),
             Packet::GameState(raw_game_state) => {
                 // println!("🎮 Game state received");
                 handle_next_move(tx, agent, raw_game_state).await?
@@ -184,6 +185,10 @@ impl WebSocketClient {
             Packet::GameEnd(game_end) => {
                 println!("[System] 🏁 Game ended");
                 handle_game_ended(agent, game_end).await?
+            }
+
+            Packet::GameStarting => {
+                handle_game_starting(tx, agent).await?;
             }
 
             // Warnings
@@ -199,6 +204,7 @@ impl WebSocketClient {
 
             // These packets are never send by the server
             Packet::Pong
+            | Packet::ReadyToReceiveGameState { .. }
             | Packet::Movement { .. }
             | Packet::Rotation { .. }
             | Packet::AbilityUse { .. }

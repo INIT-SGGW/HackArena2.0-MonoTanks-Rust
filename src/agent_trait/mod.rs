@@ -83,4 +83,5 @@ pub trait AgentTrait: Send + Sync {
     fn on_game_ended(&self, game_end: GameEnd) {
         let _ = game_end;
     }
+    fn on_game_starting(&self);
 }

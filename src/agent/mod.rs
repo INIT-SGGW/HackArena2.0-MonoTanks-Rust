@@ -161,4 +161,6 @@ impl AgentTrait for Agent {
             println!("Player: {} - Score: {}", player.nickname, player.score);
         });
     }
+
+    fn on_game_starting(&self) {}
 }

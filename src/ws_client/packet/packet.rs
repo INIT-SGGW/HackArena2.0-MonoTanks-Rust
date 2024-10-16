@@ -37,7 +37,7 @@ pub enum Packet {
     LobbyDeleted,
 
     #[serde(with = "empty_payload")]
-    GameStart,
+    GameStarted,
 
     GameState(RawGameState),
 
@@ -66,6 +66,12 @@ pub enum Packet {
     },
 
     GameEnd(GameEnd),
+
+    #[serde(with = "empty_payload")]
+    GameStarting,
+
+    #[serde(with = "empty_payload")]
+    ReadyToReceiveGameState,
 
     // Warnings
     Warning(Warning),
