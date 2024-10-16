@@ -3,7 +3,7 @@ name = "hackathon_2024_h2_rust_client"
 version = "0.1.0"
 edition = "2021"
 authors = ["KN inIT"]
-description = "Rust client written for Hackathon 2024 H2 organized by KN inIT. The client is used to communicate with the server using WebSocket protocol. And your task is to implement bot logic. Each time the game state updates on the server, it is send to you and you have to respond with your move. The game is played on a 2D grid. The game is turn-based. The player with the most points at the end of the game wins. Let the best bot win!"
+description = "Rust client written for Hackathon 2024 H2 organized by KN inIT. The client is used to communicate with the server using WebSocket protocol. And your task is to implement bot logic. Each time the game state updates on the server, it is send to you and you have to respond with your move. The game is played on a 2D grid. The player with the most points at the end of the game wins. Let the best bot win!"
 
 [dependencies]
 tokio-tungstenite = "0.23.1"
@@ -13,9 +13,6 @@ futures-channel = "0.3.17"
 url = "2.5.2"
 serde = { version = "1.0.204", features = ["derive"] }
 serde_json = "1.0.120"
-num_enum = "0.7.2"
 rand = "0.8.5"
-chrono = "0.4.38"
 clap = { version = "4.5.11", features = ["derive"] }
-subenum = "1.1.2"
 derive_more = { version = "1.0.0", features = ["full"] }

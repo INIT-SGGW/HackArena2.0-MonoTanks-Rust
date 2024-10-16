@@ -1,5 +1,5 @@
 # Stage 1: Build the Rust application
-FROM rust:1.81.0-alpine3.20 as builder
+FROM rust:1.81.0-alpine3.20 AS builder
 
 # Install musl-tools and other necessary dependencies
 RUN apk add --no-cache musl-dev
@@ -31,8 +31,14 @@ FROM scratch
 # Copy the static binary from the builder stage
 COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/hackathon_2024_h2_rust_client /app/hackathon_2024_h2_rust_client
 
+# Copy the data directory. Developers can place their files in this directory and application will have access to them.
+COPY ./data /app/data
+
 # Use a non-root user
 USER 1000
+
+# Set the working directory
+WORKDIR /app
 
 # Set the binary as the entry point
 ENTRYPOINT ["/app/hackathon_2024_h2_rust_client"]
