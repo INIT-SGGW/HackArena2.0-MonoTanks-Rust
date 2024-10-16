@@ -199,7 +199,7 @@ impl AgentTrait for Agent {
 ```
 
 The `Agent` struct implements the `AgentTrait`, which defines the agent's
-behavior. The `new` function is called when the agent is created, and the
+behavior. The `on_joining_lobby` function is called when the agent is created, and the
 `next_move` function is called every game tick to determine the agent's next
 move. The `on_game_ended` function is called when the game ends to provide the
 final game state.
@@ -212,16 +212,17 @@ final game state.
 - `Rotation { tank_rotation: Option<Rotation>, turret_rotation: Option<Rotation> }`:
   Rotate the tank and turret left or right, where `Rotation` is an enum with the
   variants `Left` and `Right`.
-- `AbilityUse { ability_type: AbilityType }`: Use an ability, such as firing a bullet.
+- `AbilityUse { ability_type: AbilityType }`: Use an ability. The possible ability types are:
+  - `FireBullet`: Fire a single bullet.
+  - `UseLaser`: Use the laser ability.
+  - `FireDoubleBullet`: Fire two bullets simultaneously.
+  - `UseRadar`: Activate the radar ability.
+  - `DropMine`: Drop a mine at the tank's current position.
 - `Pass`: Do nothing for this turn.
 
-You can modify the mentioned file and create more files in the `src/agent`
-directory. Do not modify any other files, as this may prevent us from running
-your agent during the competition.
-
-If you want to extend the functionality of the `GameState` struct or other
-structs, use the Extension Trait pattern by creating your own trait and
-implementing it for the structs or enums you want to extend.
+These ability types allow your agent to perform various actions in the game,
+from basic attacks to more strategic abilities like using radar or dropping
+mines.
 
 ### Including Static Files
 
@@ -245,7 +246,7 @@ Assuming the game server is running on `localhost:5000` (refer to the server
 repository's README for setup instructions), start the client by running:
 
 ```sh
-cargo run -- --nickname rust
+cargo run -- --nickname TEAM_NAME
 ```
 
 The `--nickname` argument is required and must be unique. For additional
@@ -258,7 +259,7 @@ cargo run -- --help
 To build and run an optimized release version of the client, use:
 
 ```sh
-cargo run --release -- --nickname rust
+cargo run --release -- --nickname TEAM_NAME
 ```
 
 ### 2. Running in a VS Code Development Container
@@ -292,7 +293,7 @@ Steps:
    ```
 2. Run the Docker container:
    ```sh
-   docker run --rm client --nickname rust --host host.docker.internal
+   docker run --rm client --nickname TEAM_NAME --host host.docker.internal
    ```
 
 If the server is running on your local machine, use the
