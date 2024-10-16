@@ -40,6 +40,19 @@ pub trait AgentTrait: Send + Sync {
         let _ = lobby_data;
     }
 
+    /// Called when the game is about to start.
+    ///
+    /// This method is invoked just before the game begins.
+    ///
+    /// # Default Behavior
+    /// By default, this method performs no action. Override this method to
+    /// implement custom behavior for your agent when the game is starting.
+    ///
+    /// # Notes
+    /// - This method is called after `on_joining_lobby` and before the first
+    ///   `next_move` call.
+    fn on_game_starting(&self);
+
     /// Called after each game tick, when new game state data is received from the server.
     /// This method is responsible for determining the agent's next move based on the
     /// current game state.
@@ -83,5 +96,4 @@ pub trait AgentTrait: Send + Sync {
     fn on_game_ended(&self, game_end: GameEnd) {
         let _ = game_end;
     }
-    fn on_game_starting(&self);
 }

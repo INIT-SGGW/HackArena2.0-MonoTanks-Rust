@@ -6,13 +6,11 @@ use crate::ws_client::packet::packets::agent_response::move_direction::MoveDirec
 use crate::ws_client::packet::packets::agent_response::rotation::Rotation;
 use crate::ws_client::packet::packets::game_end::game_end::GameEnd;
 use crate::ws_client::packet::packets::game_state::game_state::GameState;
-use crate::ws_client::packet::packets::game_state::tile::item::ItemType;
 use crate::ws_client::packet::packets::game_state::tile::tile::TileEntity;
 use crate::ws_client::packet::packets::lobby_data::LobbyData;
 
 pub struct Agent {
     my_id: String,
-    printed_map: bool,
 }
 
 impl AgentTrait for Agent {
@@ -22,7 +20,6 @@ impl AgentTrait for Agent {
     {
         Agent {
             my_id: lobby_data.player_id,
-            printed_map: false,
         }
     }
 
@@ -30,62 +27,9 @@ impl AgentTrait for Agent {
         let _ = lobby_data;
     }
 
+    fn on_game_starting(&self) {}
+
     fn next_move(&mut self, game_state: GameState) -> AgentResponse {
-        // Print map as ascii
-        if !self.printed_map {
-            self.printed_map = true;
-            println!("Map:");
-            for row in game_state.map.iter() {
-                for col in row.iter() {
-                    let entities = &col.entities;
-                    let symbol = {
-                        if entities.iter().any(|entity| entity.is_wall()) {
-                            '#'
-                        } else if entities.iter().any(|entity| {
-                            if let TileEntity::Tank(tank) = entity {
-                                tank.owner_id == self.my_id
-                            } else {
-                                false
-                            }
-                        }) {
-                            'T'
-                        } else if entities.iter().any(|entity| entity.is_tank()) {
-                            't'
-                        } else if entities.iter().any(|entity| entity.is_bullet()) {
-                            'B'
-                        } else if entities.iter().any(|entity| entity.is_laser()) {
-                            'L'
-                        } else if entities.iter().any(|entity| entity.is_mine()) {
-                            'M'
-                        } else if entities.iter().any(|entity| entity.is_item()) {
-                            let item = entities.iter().find(|entity| entity.is_item()).unwrap();
-
-                            if let TileEntity::Item(item) = item {
-                                match item.item_type {
-                                    ItemType::Unknown => '?',
-                                    ItemType::Laser => 'L',
-                                    ItemType::DoubleBullet => 'D',
-                                    ItemType::Radar => 'R',
-                                    ItemType::Mine => 'M',
-                                }
-                            } else {
-                                'I'
-                            }
-                        } else if col.visible {
-                            '.'
-                        } else if col.zone_index.is_some() {
-                            col.zone_index.unwrap() as char
-                        } else {
-                            ' '
-                        }
-                    };
-
-                    print!(" {}", symbol);
-                }
-                println!();
-            }
-        }
-
         // Find my tank
         let my_tank = game_state.map.iter().flatten().find(|tile| {
             tile.entities.iter().any(|obj| {
@@ -161,6 +105,4 @@ impl AgentTrait for Agent {
             println!("Player: {} - Score: {}", player.nickname, player.score);
         });
     }
-
-    fn on_game_starting(&self) {}
 }
