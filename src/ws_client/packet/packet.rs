@@ -34,7 +34,7 @@ pub enum Packet {
     LobbyData(LobbyData),
 
     #[serde(with = "empty_payload")]
-    LobbyDeleted,
+    LobbyDataRequest,
 
     #[serde(with = "empty_payload")]
     GameStarting,
@@ -82,6 +82,10 @@ pub enum Packet {
 
     #[serde(with = "empty_payload")]
     InvalidPacketUsageError,
+
+    InvalidPayloadError {
+        message: String,
+    },
 }
 
 impl From<Packet> for String {

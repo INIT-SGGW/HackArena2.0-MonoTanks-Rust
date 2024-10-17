@@ -172,10 +172,6 @@ impl WebSocketClient {
                 handle_prepare_to_game(tx, agent, lobby_data).await?
             }
 
-            Packet::LobbyDeleted => {
-                println!("[System] 🚪 Lobby deleted");
-            }
-
             Packet::GameStarted => println!("[System] 🎲 Game started"),
             Packet::GameState(raw_game_state) => {
                 // println!("🎮 Game state received");
@@ -201,9 +197,13 @@ impl WebSocketClient {
             Packet::InvalidPacketUsageError => {
                 println!("[System] 🚨 Client used packet in invalid way");
             }
+            Packet::InvalidPayloadError { message } => {
+                println!("[System] 🚨 Invalid payload error -> {}", message);
+            }
 
             // These packets are never send by the server
             Packet::Pong
+            | Packet::LobbyDataRequest
             | Packet::ReadyToReceiveGameState { .. }
             | Packet::Movement { .. }
             | Packet::Rotation { .. }
