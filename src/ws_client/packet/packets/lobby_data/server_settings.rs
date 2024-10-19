@@ -22,4 +22,10 @@ pub struct ServerSettings {
     /// immediately after all players have made their action (true)
     /// or at regular intervals (false).
     pub eager_broadcast: bool,
+
+    /// Indicates whether the game is running in sandbox mode.
+    pub sandbox_mode: bool,
+
+    /// The current tick of the game. This is None in sandbox mode.
+    pub tick: Option<u32>,
 }

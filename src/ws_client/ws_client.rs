@@ -12,7 +12,6 @@ use tokio_tungstenite::tungstenite::Error;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
 use super::handlers::handle_game_ended::handle_game_ended;
-use super::handlers::handle_game_starting::handle_game_starting;
 use super::handlers::handle_next_move::handle_next_move;
 use super::handlers::handle_on_warning_received::handle_on_warning_received;
 use super::handlers::handle_prepare_to_game::handle_prepare_to_game;
@@ -161,11 +160,41 @@ impl WebSocketClient {
                 .await
                 .map_err(|e| format!("🚨 Error sending Pong -> {}", e))?,
 
-            Packet::ConnectionAccepted => {
-                println!("[System] 🎉 Connection accepted");
-            }
             Packet::ConnectionRejected { reason } => {
                 println!("[System] 🚨 Connection rejected -> {}", reason);
+            }
+
+            Packet::ConnectionAccepted => {
+                println!("[System] 🎉 Connection accepted");
+
+                match tx
+                    .send(Message::Text(Packet::LobbyDataRequest.into()))
+                    .await
+                {
+                    Ok(_) => println!("[System] 🎳 Lobby data request sent"),
+                    Err(e) => eprintln!("[System] 🚨 Error sending LobbyDataRequest -> {}", e),
+                }
+            }
+
+            Packet::GameNotStarted => {
+                println!("[System] 🕒 Game not started yet");
+            }
+
+            Packet::GameInProgress => {
+                println!("[System] 🏃 Game in progress");
+            }
+
+            Packet::GameStarting => {
+                println!("[System] 🎲 Game starting");
+
+                // Wait until agent is not None
+                while agent.lock().await.is_none() {
+                    tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+                }
+
+                tx.send(Message::Text(Packet::ReadyToReceiveGameState.into()))
+                    .await
+                    .map_err(|e| format!("🚨 Error sending ReadyToReceiveGameState -> {}", e))?;
             }
 
             Packet::LobbyData(lobby_data) => {
@@ -179,13 +208,9 @@ impl WebSocketClient {
                 handle_next_move(tx, agent, raw_game_state).await?
             }
 
-            Packet::GameEnd(game_end) => {
+            Packet::GameEnded(game_end) => {
                 println!("[System] 🏁 Game ended");
                 handle_game_ended(agent, game_end).await?
-            }
-
-            Packet::GameStarting => {
-                handle_game_starting(tx, agent).await?;
             }
 
             // Warnings
@@ -224,12 +249,13 @@ impl WebSocketClient {
             // These packets are never send by the server
             Packet::Pong
             | Packet::LobbyDataRequest
+            | Packet::GameStatusRequest
             | Packet::ReadyToReceiveGameState { .. }
             | Packet::Movement { .. }
             | Packet::Rotation { .. }
             | Packet::AbilityUse { .. }
             | Packet::Pass { .. } => {
-                unreachable!()
+                println!("[System] ⚠️ Unexpected packet received: {:?}", packet);
             }
         };
 

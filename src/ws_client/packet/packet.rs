@@ -30,6 +30,15 @@ pub enum Packet {
     GameStarting,
 
     #[serde(with = "empty_payload")]
+    GameNotStarted,
+
+    #[serde(with = "empty_payload")]
+    GameInProgress,
+
+    #[serde(with = "empty_payload")]
+    GameStatusRequest,
+
+    #[serde(with = "empty_payload")]
     ReadyToReceiveGameState,
 
     #[serde(with = "empty_payload")]
@@ -61,7 +70,7 @@ pub enum Packet {
         game_state_id: String,
     },
 
-    GameEnd(GameEnd),
+    GameEnded(GameEnd),
 
     // Warnings
     #[serde(with = "empty_payload")]
