@@ -28,4 +28,7 @@ pub struct ServerSettings {
 
     /// The current tick of the game. This is None in sandbox mode.
     pub tick: Option<u32>,
+
+    /// The name of the match.
+    pub match_name: Option<String>,
 }
