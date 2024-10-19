@@ -1,5 +1,4 @@
 use crate::agent_trait::AgentTrait;
-use crate::ws_client::packet::packet::Warning;
 use crate::ws_client::packet::packets::agent_response::ability_type::AbilityType;
 use crate::ws_client::packet::packets::agent_response::agent_response::AgentResponse;
 use crate::ws_client::packet::packets::agent_response::move_direction::MoveDirection;
@@ -8,6 +7,7 @@ use crate::ws_client::packet::packets::game_end::game_end::GameEnd;
 use crate::ws_client::packet::packets::game_state::game_state::GameState;
 use crate::ws_client::packet::packets::game_state::tile::tile::TileEntity;
 use crate::ws_client::packet::packets::lobby_data::LobbyData;
+use crate::ws_client::packet::warning::Warning;
 
 pub struct Agent {
     my_id: String,

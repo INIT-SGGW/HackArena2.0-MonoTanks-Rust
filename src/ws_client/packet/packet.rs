@@ -9,16 +9,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", tag = "type", content = "payload")]
-pub enum Warning {
-    PlayerAlreadyMadeActionWarning,
-    MissingGameStateIdWarning,
-    SlowResponseWarning,
-    ActionIgnoredDueToDeadWarning,
-    CustomWarning { message: String },
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", tag = "type", content = "payload")]
 pub enum Packet {
     #[serde(with = "empty_payload")]
     Ping,
@@ -74,7 +64,21 @@ pub enum Packet {
     GameEnd(GameEnd),
 
     // Warnings
-    Warning(Warning),
+    #[serde(with = "empty_payload")]
+    PlayerAlreadyMadeActionWarning,
+
+    #[serde(with = "empty_payload")]
+    MissingGameStateIdWarning,
+
+    #[serde(with = "empty_payload")]
+    SlowResponseWarning,
+
+    #[serde(with = "empty_payload")]
+    ActionIgnoredDueToDeadWarning,
+
+    CustomWarning {
+        message: String,
+    },
 
     // Errors
     #[serde(with = "empty_payload")]

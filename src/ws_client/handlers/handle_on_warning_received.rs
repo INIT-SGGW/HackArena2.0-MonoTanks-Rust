@@ -1,6 +1,6 @@
 use crate::agent::Agent;
 use crate::agent_trait::AgentTrait;
-use crate::ws_client::packet::packet::Warning;
+use crate::ws_client::packet::warning::Warning;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 

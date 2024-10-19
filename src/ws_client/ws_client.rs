@@ -17,6 +17,7 @@ use super::handlers::handle_next_move::handle_next_move;
 use super::handlers::handle_on_warning_received::handle_on_warning_received;
 use super::handlers::handle_prepare_to_game::handle_prepare_to_game;
 use super::packet::packet::Packet;
+use super::packet::warning::Warning;
 
 pub struct WebSocketClient {
     read_task: JoinHandle<()>,
@@ -188,7 +189,26 @@ impl WebSocketClient {
             }
 
             // Warnings
-            Packet::Warning(warning) => handle_on_warning_received(agent, warning).await?,
+            Packet::PlayerAlreadyMadeActionWarning => {
+                let warning = Warning::PlayerAlreadyMadeActionWarning;
+                handle_on_warning_received(agent, warning).await?;
+            }
+            Packet::MissingGameStateIdWarning => {
+                let warning = Warning::MissingGameStateIdWarning;
+                handle_on_warning_received(agent, warning).await?;
+            }
+            Packet::SlowResponseWarning => {
+                let warning = Warning::SlowResponseWarning;
+                handle_on_warning_received(agent, warning).await?;
+            }
+            Packet::ActionIgnoredDueToDeadWarning => {
+                let warning = Warning::ActionIgnoredDueToDeadWarning;
+                handle_on_warning_received(agent, warning).await?;
+            }
+            Packet::CustomWarning { message } => {
+                let warning = Warning::CustomWarning { message };
+                handle_on_warning_received(agent, warning).await?;
+            }
 
             // Errors
             Packet::InvalidPacketTypeError => {

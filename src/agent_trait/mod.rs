@@ -1,8 +1,8 @@
-use crate::ws_client::packet::packet::Warning;
 use crate::ws_client::packet::packets::agent_response::agent_response::AgentResponse;
 use crate::ws_client::packet::packets::game_end::game_end::GameEnd;
 use crate::ws_client::packet::packets::game_state::game_state::GameState;
 use crate::ws_client::packet::packets::lobby_data::LobbyData;
+use crate::ws_client::packet::warning::Warning;
 
 /// A trait that defines the behavior of an AI agent interacting with the game
 /// by responding to game state updates and making decisions based on the current state.
