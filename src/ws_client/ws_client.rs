@@ -1,15 +1,14 @@
 use crate::agent::Agent;
 use futures_util::stream::{SplitSink, SplitStream};
-use futures_util::SinkExt;
-use futures_util::StreamExt;
+use futures_util::{SinkExt, StreamExt};
 use std::sync::Arc;
 use tokio::net::TcpStream;
 use tokio::sync::mpsc::{Receiver, Sender};
 use tokio::sync::Mutex;
-use tokio::task::{JoinError, JoinHandle};
-use tokio::try_join;
+use tokio::task::JoinHandle;
 use tokio_tungstenite::tungstenite::Error;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
+use tokio_util::sync::CancellationToken;
 
 use super::handlers::handle_game_ended::handle_game_ended;
 use super::handlers::handle_next_move::handle_next_move;
@@ -19,8 +18,9 @@ use super::packet::packet::Packet;
 use super::packet::warning::Warning;
 
 pub struct WebSocketClient {
-    read_task: JoinHandle<()>,
-    writer_task: JoinHandle<()>,
+    read_task: JoinHandle<Result<(), Error>>,
+    writer_task: JoinHandle<Result<(), Error>>,
+    cancel_token: CancellationToken,
 }
 
 impl WebSocketClient {
@@ -29,6 +29,7 @@ impl WebSocketClient {
         port: u16,
         code: &str,
         nickname: &str,
+        cancel_token: CancellationToken,
     ) -> Result<WebSocketClient, Error> {
         // Construct proper url
         let url = Self::construct_url(host, port, code, nickname);
@@ -46,26 +47,43 @@ impl WebSocketClient {
         // Split the stream into write and read parts
         let (write, read) = websocket_stream.split();
 
-        // Create channel for sending messages to the WebSocket
         let (tx, rx) = tokio::sync::mpsc::channel(100);
-
-        // Create WebSocket writer task
-        let writer_task = Self::create_writer_task(write, rx);
-
-        // Create agent
         let agent = Arc::new(Mutex::new(None));
 
-        // Create WebSocket reader task
-        let read_task = Self::create_reader_task(read, tx, agent);
+        let writer_task = Self::create_writer_task(write, rx, cancel_token.clone());
+        let read_task = Self::create_reader_task(read, tx, agent, cancel_token.clone());
 
         Ok(WebSocketClient {
             read_task,
             writer_task,
+            cancel_token,
         })
     }
 
-    pub async fn run(self) -> Result<((), ()), JoinError> {
-        try_join!(self.read_task, self.writer_task)
+    pub async fn run(self) -> Result<(), Box<dyn std::error::Error>> {
+        let WebSocketClient {
+            read_task,
+            writer_task,
+            cancel_token,
+        } = self;
+
+        tokio::select! {
+            _ = cancel_token.cancelled() => {
+                println!("[System] 👋 Client shutting down...");
+            }
+            read_result = read_task => {
+                if let Err(e) = read_result? {
+                    eprintln!("[System] 📚 Read task error: {}", e);
+                }
+            }
+            write_result = writer_task => {
+                if let Err(e) = write_result? {
+                    eprintln!("[System] 📝 Write task error: {}", e);
+                }
+            }
+        }
+
+        Ok(())
     }
 
     pub fn construct_url(host: &str, port: u16, code: &str, nickname: &str) -> String {
@@ -85,12 +103,28 @@ impl WebSocketClient {
     fn create_writer_task(
         mut write: SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>,
         mut rx: Receiver<Message>,
-    ) -> JoinHandle<()> {
+        cancel_token: CancellationToken,
+    ) -> JoinHandle<Result<(), Error>> {
         tokio::spawn(async move {
-            while let Some(message) = rx.recv().await {
-                match write.send(message).await {
-                    Ok(_) => {}
-                    Err(e) => eprintln!("[System] 🌋 WebSocket send error -> {}", e),
+            loop {
+                tokio::select! {
+                    message = rx.recv() => {
+                        match message {
+                            Some(message) => {
+                                if let Err(e) = write.send(message).await {
+                                    eprintln!("[System] 🌋 WebSocket send error: {}", e);
+                                    break Err(e);
+                                }
+                            }
+                            None => break Ok(()),
+                        }
+                    }
+                    _ = cancel_token.cancelled() => {
+                        if let Err(e) = write.close().await {
+                            eprintln!("[System] 🌋 Error closing WebSocket connection: {}", e);
+                        }
+                        break Ok(());
+                    }
                 }
             }
         })
@@ -100,15 +134,30 @@ impl WebSocketClient {
         mut read: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
         tx: Sender<Message>,
         agent: Arc<Mutex<Option<Agent>>>,
-    ) -> JoinHandle<()> {
+        cancel_token: CancellationToken,
+    ) -> JoinHandle<Result<(), Error>> {
         tokio::spawn(async move {
-            while let Some(message) = read.next().await {
-                match message {
-                    Ok(message) => {
-                        tokio::spawn(Self::process_message(message, tx.clone(), agent.clone()));
+            loop {
+                tokio::select! {
+                    message = read.next() => {
+                        match message {
+                            Some(Ok(message)) => {
+                                Self::process_message(message, tx.clone(), agent.clone()).await;
+                            }
+                            Some(Err(e)) => {
+                                eprintln!("[System] 🌋 WebSocket receive error: {}", e);
+                                cancel_token.cancel();
+                                break Err(e);
+                            }
+                            None => {
+                                println!("[System] 🔌 Connection closed by server");
+                                cancel_token.cancel();
+                                break Ok(());
+                            }
+                        }
                     }
-                    Err(e) => {
-                        eprintln!("[System] 🌋 WebSocket receive error -> {}", e);
+                    _ = cancel_token.cancelled() => {
+                        break Ok(());
                     }
                 }
             }

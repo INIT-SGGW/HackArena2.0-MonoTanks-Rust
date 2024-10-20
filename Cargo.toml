@@ -8,6 +8,7 @@ description = "Rust client written for Hackathon 2024 H2 organized by KN inIT. T
 [dependencies]
 tokio-tungstenite = "0.23.1"
 tokio = { version = "1.38.1", features = ["full"] }
+tokio-util = "0.7.12"
 futures-util = "0.3.17"
 futures-channel = "0.3.17"
 url = "2.5.2"
