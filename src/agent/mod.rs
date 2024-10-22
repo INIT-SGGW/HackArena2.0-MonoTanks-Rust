@@ -5,6 +5,10 @@ use crate::ws_client::packet::packets::agent_response::move_direction::MoveDirec
 use crate::ws_client::packet::packets::agent_response::rotation::Rotation;
 use crate::ws_client::packet::packets::game_end::game_end::GameEnd;
 use crate::ws_client::packet::packets::game_state::game_state::GameState;
+use crate::ws_client::packet::packets::game_state::tile::bullet::BulletType;
+use crate::ws_client::packet::packets::game_state::tile::direction::Direction;
+use crate::ws_client::packet::packets::game_state::tile::item::ItemType;
+use crate::ws_client::packet::packets::game_state::tile::laser::LaserOrientation;
 use crate::ws_client::packet::packets::game_state::tile::tile::TileEntity;
 use crate::ws_client::packet::packets::lobby_data::LobbyData;
 use crate::ws_client::packet::warning::Warning;
@@ -65,9 +69,79 @@ impl AgentTrait for Agent {
     /// - `AgentResponse`: The action or decision made by the agent, which will
     ///   be communicated back to the game server.
     fn next_move(&mut self, game_state: GameState) -> AgentResponse {
+        // Print map
+        println!("Map:");
+        for row in &game_state.map {
+            for col in row {
+                let symbol = {
+                    if col.entities.iter().any(|entity| entity.is_wall()) {
+                        '#'
+                    } else {
+                        let entity_symbol = col.entities.iter().find_map(|entity| match entity {
+                            TileEntity::Tank(tank) if tank.owner_id == self.my_id => {
+                                Some(match tank.direction {
+                                    Direction::Left => '<',
+                                    Direction::Right => '>',
+                                    Direction::Up => '^',
+                                    Direction::Down => 'v',
+                                })
+
+                                // There is also turrent direction.
+                                // tank.turret.direction
+                            }
+                            TileEntity::Tank(_) => Some('T'),
+                            TileEntity::Bullet(bullet) => Some(match bullet.bullet_type {
+                                BulletType::Basic => match bullet.direction {
+                                    Direction::Left => '←',
+                                    Direction::Right => '→',
+                                    Direction::Up => '↑',
+                                    Direction::Down => '↓',
+                                },
+                                BulletType::Double => match bullet.direction {
+                                    Direction::Left => '⇇',
+                                    Direction::Right => '⇉',
+                                    Direction::Up => '⇈',
+                                    Direction::Down => '⇊',
+                                },
+                            }),
+                            TileEntity::Laser(laser) => Some(match laser.orientation {
+                                LaserOrientation::Horizontal => '-',
+                                LaserOrientation::Vertical => '|',
+                            }),
+                            TileEntity::Mine(_) => Some('X'),
+                            TileEntity::Item(item) => Some(match item.item_type {
+                                ItemType::Unknown => '?',
+                                ItemType::Laser => 'L',
+                                ItemType::DoubleBullet => 'D',
+                                ItemType::Radar => 'R',
+                                ItemType::Mine => 'M',
+                            }),
+                            _ => None,
+                        });
+
+                        entity_symbol.unwrap_or_else(|| {
+                            if let Some(zone_index) = col.zone_index {
+                                if col.visible {
+                                    (zone_index as u8) as char
+                                } else {
+                                    (zone_index as u8 + 32) as char
+                                }
+                            } else if col.visible {
+                                '.'
+                            } else {
+                                ' '
+                            }
+                        })
+                    }
+                };
+                print!(" {}", symbol);
+            }
+            println!();
+        }
+
         // Find my tank
-        let my_tank = game_state.map.iter().flatten().find(|tile| {
-            tile.entities.iter().any(|obj| {
+        let my_tank = game_state.map.iter().flatten().find_map(|tile| {
+            tile.entities.iter().find(|obj| {
                 if let TileEntity::Tank(tank) = obj {
                     tank.owner_id == self.my_id
                 } else {
@@ -172,8 +246,8 @@ impl AgentTrait for Agent {
             println!("I won!");
         }
 
-        game_end.players.iter().for_each(|player| {
+        for player in &game_end.players {
             println!("Player: {} - Score: {}", player.nickname, player.score);
-        });
+        }
     }
 }
