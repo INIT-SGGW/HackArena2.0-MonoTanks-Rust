@@ -171,10 +171,16 @@ impl WebSocketClient {
     ) {
         match message {
             Message::Text(message) => {
-                if let Err(e) = Self::process_text_message(message.clone(), tx, agent).await {
-                    eprintln!("[System] 🚨 Error processing text message -> {}", e);
-                    eprintln!("[System] 🚨 Text Message -> {}", message);
-                }
+                let tx_clone = tx.clone();
+                let agent_clone = agent.clone();
+                tokio::task::spawn(async move {
+                    if let Err(e) =
+                        Self::process_text_message(message.clone(), tx_clone, agent_clone).await
+                    {
+                        eprintln!("[System] 🚨 Error processing text message -> {}", e);
+                        eprintln!("[System] 🚨 Text Message -> {}", message);
+                    }
+                });
             }
             Message::Ping(message) => {
                 tx.send(Message::Pong(message)).await.unwrap();
