@@ -177,12 +177,9 @@ impl WebSocketClient {
                 }
             }
             Message::Ping(message) => {
-                println!("[System] 🏓 Received Ping");
                 tx.send(Message::Pong(message)).await.unwrap();
             }
-            Message::Pong(_) => {
-                println!("[System] 🏓 Received Pong");
-            }
+            Message::Pong(_) => {}
             Message::Close(_) => {
                 println!("[System] 🚪 Connection closed");
             }
