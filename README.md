@@ -1,8 +1,8 @@
-# Rust WebSocket Client for Hackathon 2024
+# Bot Template in Rust for HackArena 2024
 
-This Rust-based WebSocket client was developed for the Hackathon 2024, organized
-by WULS-SGGW. It serves as a framework for participants to create AI agents that
-can play the game.
+This template for a Bot for MonoTanks game for the HackArena 2024,
+organized by WULS-SGGW. Is is implemented as a WebSocket client written
+in Rust programming language.
 
 To fully test and run the game, you will also need the game server and GUI
 client, as the GUI provides a visual representation of gameplay. You can find
@@ -10,7 +10,18 @@ more information about the server and GUI client in the following repository:
 
 - [Server and GUI Client Repository](https://github.com/INIT-SGGW/HackArena2024H2-Game)
 
+The guide to the game mechanics and hackathon rules can be found on the:
+- [instruction page](https://github.com/INIT-SGGW/HackArena2024H2-Game/blob/main/README.md).
+
 ## Development
+
+Clone this repo using git:
+```sh
+git clone https://github.com/INIT-SGGW/HackArena2024H2-Rust.git
+```
+
+or download the [zip file](https://github.com/INIT-SGGW/HackArena2024H2-Rust/archive/refs/heads/main.zip)
+and extract it.
 
 The agent logic you are going to implement is located in `src/agent/mod.rs`:
 
@@ -57,19 +68,6 @@ impl AgentTrait for Agent {
     fn on_lobby_data_changed(&mut self, lobby_data: LobbyData) {
         let _ = lobby_data;
     }
-
-    /// Called when the game is about to start.
-    ///
-    /// This method is invoked just before the game begins.
-    ///
-    /// # Default Behavior
-    /// By default, this method performs no action. Override this method to
-    /// implement custom behavior for your agent when the game is starting.
-    ///
-    /// # Notes
-    /// - This method is called after `on_joining_lobby` and before the first
-    ///   `next_move` call.
-    fn on_game_starting(&self) {}
 
     /// Called after each game tick, when new game state data is received from the server.
     /// This method is responsible for determining the agent's next move based on the
@@ -198,36 +196,6 @@ impl AgentTrait for Agent {
 }
 ```
 
-The `Agent` struct implements the `AgentTrait`, which defines the agent's
-behavior. The `on_joining_lobby` function is called when the agent is created, and the
-`next_move` function is called every game tick to determine the agent's next
-move. The `on_game_ended` function is called when the game ends to provide the
-final game state.
-
-`next_move` returns an `AgentResponse` enum, which can be one of the following:
-
-- `Movement { direction: MoveDirection }`: Move the tank forward or
-  backward, where `MoveDirection` is an enum with the variants `Forward` and
-  `Backward`.
-- `Rotation { tank_rotation: Option<Rotation>, turret_rotation: Option<Rotation> }`:
-  Rotate the tank and turret left or right, where `Rotation` is an enum with the
-  variants `Left` and `Right`.
-- `AbilityUse { ability_type: AbilityType }`: Use an ability. The possible ability types are:
-  - `FireBullet`: Fire a single bullet.
-  - `UseLaser`: Use the laser ability.
-  - `FireDoubleBullet`: Fire two bullets simultaneously.
-  - `UseRadar`: Activate the radar ability.
-  - `DropMine`: Drop a mine at the tank's current position.
-- `Pass`: Do nothing for this turn.
-
-These ability types allow your agent to perform various actions in the game,
-from basic attacks to more strategic abilities like using radar or dropping
-mines.
-
-### Including Static Files
-
-If you need to include static files that your program should access during testing or execution, place them in the `data` folder. This folder is copied into the Docker image and will be accessible to your application at runtime. For example, you could include configuration files, pre-trained models, or any other data your agent might need.
-
 ## Running the Client
 
 You can run this client in three different ways: locally, within a VS Code
@@ -282,6 +250,12 @@ Code's integrated terminal, as if you were running the project locally. However,
 if server is running on your local machine, you should use `host.docker.internal`
 as a host.
 
+So the command to run the client would be:
+
+```sh
+cargo run -- --host host.docker.internal --nickname TEAM_NAME
+```
+
 ### 3. Running in a Docker Container (Manual Setup)
 
 To run the client manually in a Docker container, ensure Docker is installed on
@@ -305,3 +279,32 @@ host.
 If you are using a machine with ARM architecture (like Apple M series processors),
 you should modify the Dockerfile and change every occurrence of `x86_64` to
 `aarch64`.
+
+## FAQ
+
+### What can we modify?
+
+You can modify the `src/agent/mod.rs` file to implement your own agent logic
+as well as create new files in the `src/agent` directory to implement additional
+functionality. In case you would like to implement new methods on existing
+structs, use the new type pattern or extension trait pattern.
+
+You can add new crates to the `Cargo.toml` file, but do not delete or change
+versions of the crates that are already present in the file.
+
+Please, do not modify any other files, as they are used for proper network
+communication with the game server.
+
+### Can we include static files?
+
+If you need to include static files that your program should access during
+testing or execution, place them in the `data` folder. This folder is copied
+into the Docker image and will be accessible to your application at runtime. For
+example, you could include configuration files, pre-trained models, or any other
+data your agent might need.
+
+### In what format we will need to submit our bot?
+
+You will need to submit a zip file containing the whole repository. Of course,
+please, delete the `target` directory and any other temporary files before
+submitting, so the file size is as small as possible.
