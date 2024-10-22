@@ -178,7 +178,6 @@ impl WebSocketClient {
                         Self::process_text_message(message.clone(), tx_clone, agent_clone).await
                     {
                         eprintln!("[System] 🚨 Error processing text message -> {}", e);
-                        eprintln!("[System] 🚨 Text Message -> {}", message);
                     }
                 });
             }
