@@ -338,7 +338,7 @@ Steps:
    ```
 2. Run the Docker container:
    ```sh
-   docker run --rm bot --nickname TEAM_NAME --host host.docker.internal
+   docker run --rm bot --host host.docker.internal --nickname TEAM_NAME
    ```
 
 If the server is running on your local machine, use the

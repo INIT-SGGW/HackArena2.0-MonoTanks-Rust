@@ -15,7 +15,7 @@ pub struct ServerSettings {
     /// It is used to generate the grid and player starting positions.
     pub seed: u32,
 
-    /// The interval at which broadcast messages are sent to clients, in milliseconds.
+    /// The interval at which broadcast messages are sent to bots, in milliseconds.
     pub broadcast_interval: u32,
 
     /// A flag that determines whether broadcasts should happen

@@ -1,9 +1,9 @@
 [package]
-name = "hackathon_2024_h2_rust_client"
+name = "HackArena2_0_MonoTanks_Rust"
 version = "0.1.0"
 edition = "2021"
 authors = ["KN inIT"]
-description = "Rust client written for Hackathon 2024 H2 organized by KN inIT. The client is used to communicate with the server using WebSocket protocol. And your task is to implement bot logic. Each time the game state updates on the server, it is send to you and you have to respond with your move. The game is played on a 2D grid. The player with the most points at the end of the game wins. Let the best bot win!"
+description = "MonoTanks API wrapper in Rust for HackArena 2.0 organized by KN inIT. The api wrapper is used to communicate with the server using WebSocket protocol. And your task is to implement bot logic. Each time the game state updates on the server, it is send to you and you have to respond with your move. The game is played on a 2D grid. The player with the most points at the end of the game wins. Let the best bot win!"
 
 [dependencies]
 tokio-tungstenite = "0.23.1"

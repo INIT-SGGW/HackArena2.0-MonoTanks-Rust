@@ -29,7 +29,7 @@ RUN cargo build --release --target x86_64-unknown-linux-musl
 FROM scratch
 
 # Copy the static binary from the builder stage
-COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/hackathon_2024_h2_rust_client /app/hackathon_2024_h2_rust_client
+COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/HackArena2_0_MonoTanks_Rust /app/HackArena2_0_MonoTanks_Rust
 
 # Copy the data directory. Developers can place their files in this directory and application will have access to them.
 COPY ./data /app/data
@@ -41,4 +41,4 @@ USER 1000
 WORKDIR /app
 
 # Set the binary as the entry point
-ENTRYPOINT ["/app/hackathon_2024_h2_rust_client"]
+ENTRYPOINT ["/app/HackArena2_0_MonoTanks_Rust"]

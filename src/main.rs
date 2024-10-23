@@ -1,7 +1,7 @@
 use clap::Parser;
-use hackathon_2024_h2_rust_client::{args::Args, ws_client::ws_client::WebSocketClient};
 use tokio::signal;
 use tokio_util::sync::CancellationToken;
+use HackArena2_0_MonoTanks_Rust::{args::Args, ws_client::ws_client::WebSocketClient};
 
 #[tokio::main]
 async fn main() {
@@ -12,7 +12,7 @@ async fn main() {
         nickname,
     } = Args::parse();
 
-    println!("[System] 🚀 Starting client...");
+    println!("[System] 🚀 Starting bot...");
 
     // Create a single cancellation token for both CTRL+C and connection loss
     let cancel_token = CancellationToken::new();

@@ -69,7 +69,7 @@ impl WebSocketClient {
 
         tokio::select! {
             _ = cancel_token.cancelled() => {
-                println!("[System] 👋 Client shutting down...");
+                println!("[System] 👋 WebSocket client shutting down...");
             }
             read_result = read_task => {
                 if let Err(e) = read_result? {
@@ -284,10 +284,10 @@ impl WebSocketClient {
 
             // Errors
             Packet::InvalidPacketTypeError => {
-                println!("[System] 🚨 Client sent an invalid packet type error");
+                println!("[System] 🚨 WebSocket client sent an invalid packet type error");
             }
             Packet::InvalidPacketUsageError => {
-                println!("[System] 🚨 Client used packet in invalid way");
+                println!("[System] 🚨 WebSocket client used packet in invalid way");
             }
             Packet::InvalidPayloadError { message } => {
                 println!("[System] 🚨 Invalid payload error -> {}", message);
