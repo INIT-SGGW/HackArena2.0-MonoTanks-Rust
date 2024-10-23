@@ -1,8 +1,8 @@
-# Bot Template in Rust for HackArena 2024
+# MonoTanks API wrapper in Rust for HackArena 2.0
 
-This template for a Bot for MonoTanks game for the HackArena 2024,
-organized by WULS-SGGW. Is is implemented as a WebSocket client written
-in Rust programming language.
+This API wrapper for MonoTanks game for the HackArena 2.0, organized by
+WULS-SGGW. It is implemented as a WebSocket client written in Rust programming
+language.
 
 To fully test and run the game, you will also need the game server and GUI
 client, as the GUI provides a visual representation of gameplay. You can find
@@ -10,7 +10,7 @@ more information about the server and GUI client in the following repository:
 
 - [Server and GUI Client Repository](https://github.com/INIT-SGGW/HackArena2024H2-Game)
 
-The guide to the game mechanics and hackathon rules can be found on the:
+The guide to the game mechanics and tournament rules can be found on the:
 - [instruction page](https://github.com/INIT-SGGW/HackArena2024H2-Game/blob/main/README.md).
 
 ## Development
@@ -23,29 +23,29 @@ git clone https://github.com/INIT-SGGW/HackArena2024H2-Rust.git
 or download the [zip file](https://github.com/INIT-SGGW/HackArena2024H2-Rust/archive/refs/heads/main.zip)
 and extract it.
 
-The agent logic you are going to implement is located in `src/agent/mod.rs`:
+The bot logic you are going to implement is located in `src/bot/mod.rs`:
 
 ```rust
-pub struct Agent {
+pub struct Bot {
     my_id: String,
 }
 
-impl AgentTrait for Agent {
-    /// Called when the agent joins a lobby, creating a new instance of the agent.
-    /// This method initializes the agent with the lobby's current state and
+impl BotTrait for Bot {
+    /// Called when the bot joins a lobby, creating a new instance of the bot.
+    /// This method initializes the bot with the lobby's current state and
     /// other relevant details.
     ///
     /// # Parameters
-    /// - `lobby_data`: The initial state of the lobby when the agent joins.
+    /// - `lobby_data`: The initial state of the lobby when the bot joins.
     ///   Contains information like player data, game settings, etc.
     ///
     /// # Returns
-    /// - A new instance of the agent.
+    /// - A new instance of the bot.
     fn on_joining_lobby(lobby_data: LobbyData) -> Self
     where
         Self: Sized,
     {
-        Agent {
+        Bot {
             my_id: lobby_data.player_id,
         }
     }
@@ -59,7 +59,7 @@ impl AgentTrait for Agent {
     /// # Parameters
     /// - `lobby_data`: The updated state of the lobby, containing information
     ///   like player details, game configurations, and other relevant data.
-    ///   This is the same data structure as the one provided when the agent
+    ///   This is the same data structure as the one provided when the bot
     ///   first joined the lobby.
     ///
     /// # Default Behavior
@@ -70,21 +70,91 @@ impl AgentTrait for Agent {
     }
 
     /// Called after each game tick, when new game state data is received from the server.
-    /// This method is responsible for determining the agent's next move based on the
+    /// This method is responsible for determining the bot's next move based on the
     /// current game state.
     ///
     /// # Parameters
     /// - `game_state`: The current state of the game, which includes all
-    ///   necessary information for the agent to decide its next action,
+    ///   necessary information for the bot to decide its next action,
     ///   such as the entire map with walls, tanks, bullets, zones, etc.
     ///
     /// # Returns
-    /// - `AgentResponse`: The action or decision made by the agent, which will
+    /// - `BotResponse`: The action or decision made by the bot, which will
     ///   be communicated back to the game server.
-    fn next_move(&mut self, game_state: GameState) -> AgentResponse {
+    fn next_move(&mut self, game_state: GameState) -> BotResponse {
+        // Print map
+        println!("Map:");
+        for row in &game_state.map {
+            for col in row {
+                let symbol = {
+                    if col.entities.iter().any(|entity| entity.is_wall()) {
+                        '#'
+                    } else {
+                        let entity_symbol = col.entities.iter().find_map(|entity| match entity {
+                            TileEntity::Tank(tank) if tank.owner_id == self.my_id => {
+                                Some(match tank.direction {
+                                    Direction::Left => '<',
+                                    Direction::Right => '>',
+                                    Direction::Up => '^',
+                                    Direction::Down => 'v',
+                                })
+
+                                // There is also turrent direction.
+                                // tank.turret.direction
+                            }
+                            TileEntity::Tank(_) => Some('T'),
+                            TileEntity::Bullet(bullet) => Some(match bullet.bullet_type {
+                                BulletType::Basic => match bullet.direction {
+                                    Direction::Left => '←',
+                                    Direction::Right => '→',
+                                    Direction::Up => '↑',
+                                    Direction::Down => '↓',
+                                },
+                                BulletType::Double => match bullet.direction {
+                                    Direction::Left => '⇇',
+                                    Direction::Right => '⇉',
+                                    Direction::Up => '⇈',
+                                    Direction::Down => '⇊',
+                                },
+                            }),
+                            TileEntity::Laser(laser) => Some(match laser.orientation {
+                                LaserOrientation::Horizontal => '-',
+                                LaserOrientation::Vertical => '|',
+                            }),
+                            TileEntity::Mine(_) => Some('X'),
+                            TileEntity::Item(item) => Some(match item.item_type {
+                                ItemType::Unknown => '?',
+                                ItemType::Laser => 'L',
+                                ItemType::DoubleBullet => 'D',
+                                ItemType::Radar => 'R',
+                                ItemType::Mine => 'M',
+                            }),
+                            _ => None,
+                        });
+
+                        entity_symbol.unwrap_or_else(|| {
+                            if let Some(zone_index) = col.zone_index {
+                                if col.visible {
+                                    (zone_index as u8) as char
+                                } else {
+                                    (zone_index as u8 + 32) as char
+                                }
+                            } else if col.visible {
+                                '.'
+                            } else {
+                                ' '
+                            }
+                        })
+                    }
+                };
+                print!(" {}", symbol);
+            }
+            println!();
+        }
+
         // Find my tank
-        let my_tank = game_state.map.iter().flatten().find(|tile| {
-            tile.entities.iter().any(|obj| {
+        let my_tank = game_state.map.iter().flatten().find_map(|tile| {
+            tile.entities.iter().find(|obj| {
                 if let TileEntity::Tank(tank) = obj {
                     tank.owner_id == self.my_id
                 } else {
@@ -95,7 +165,7 @@ impl AgentTrait for Agent {
 
         // If our tank is not found, it is dead, and we should pass
         if my_tank.is_none() {
-            return AgentResponse::Pass;
+            return BotResponse::Pass;
         }
 
         // Do a random action
@@ -107,7 +177,7 @@ impl AgentTrait for Agent {
                     MoveDirection::Backward
                 };
 
-                AgentResponse::Movement { direction }
+                BotResponse::Movement { direction }
             }
             r if r < 0.50 => {
                 let random_rotation = || match rand::random::<f32>() {
@@ -116,7 +186,7 @@ impl AgentTrait for Agent {
                     _ => None,
                 };
 
-                AgentResponse::Rotation {
+                BotResponse::Rotation {
                     tank_rotation: random_rotation(),
                     turret_rotation: random_rotation(),
                 }
@@ -136,14 +206,14 @@ impl AgentTrait for Agent {
                     AbilityType::UseRadar
                 };
 
-                AgentResponse::AbilityUse { ability_type }
+                BotResponse::AbilityUse { ability_type }
             }
-            _ => AgentResponse::Pass,
+            _ => BotResponse::Pass,
         }
     }
 
     /// Called when a warning is received from the server.
-    /// Please, do remember that if you agent is stuck on processing warning,
+    /// Please, do remember that if your bot is stuck on processing warning,
     /// the next move won't be called and vice versa.
     ///
     /// # Parameters
@@ -172,8 +242,7 @@ impl AgentTrait for Agent {
     ///
     /// # Default Behavior
     /// By default, this method performs no action. You can override it to
-    /// implement any post-game behavior, such as logging, updating agent strategies,
-    /// or other clean-up tasks.
+    /// implement any post-game behavior, such as logging or other clean-up tasks.
     ///
     /// # Notes
     /// - This method is optional to override, but it can be useful for handling
@@ -189,21 +258,21 @@ impl AgentTrait for Agent {
             println!("I won!");
         }
 
-        game_end.players.iter().for_each(|player| {
+        for player in &game_end.players {
             println!("Player: {} - Score: {}", player.nickname, player.score);
-        });
+        }
     }
 }
 ```
 
-## Running the Client
+## Running the Bot
 
-You can run this client in three different ways: locally, within a VS Code
+You can run this bot in three different ways: locally, within a VS Code
 development container, or manually using Docker.
 
 ### 1. Running Locally
 
-To run the client locally, you must have Rust 1.75 or later installed. Verify
+To run the bot locally, you must have Rust 1.75 or later installed. Verify
 your Rust version by running:
 
 ```sh
@@ -211,7 +280,7 @@ rustc --version
 ```
 
 Assuming the game server is running on `localhost:5000` (refer to the server
-repository's README for setup instructions), start the client by running:
+repository's README for setup instructions), start the bot by running:
 
 ```sh
 cargo run -- --nickname TEAM_NAME
@@ -224,7 +293,7 @@ configuration options, run:
 cargo run -- --help
 ```
 
-To build and run an optimized release version of the client, use:
+To build and run an optimized release version of the bot, use:
 
 ```sh
 cargo run --release -- --nickname TEAM_NAME
@@ -232,7 +301,7 @@ cargo run --release -- --nickname TEAM_NAME
 
 ### 2. Running in a VS Code Development Container
 
-To run the client within a VS Code development container, ensure you have Docker
+To run the bot within a VS Code development container, ensure you have Docker
 and Visual Studio Code (VS Code) installed, along with the Dev Containers
 extension.
 
@@ -250,7 +319,7 @@ Code's integrated terminal, as if you were running the project locally. However,
 if server is running on your local machine, you should use `host.docker.internal`
 as a host.
 
-So the command to run the client would be:
+So the command to run the bot would be:
 
 ```sh
 cargo run -- --host host.docker.internal --nickname TEAM_NAME
@@ -258,18 +327,18 @@ cargo run -- --host host.docker.internal --nickname TEAM_NAME
 
 ### 3. Running in a Docker Container (Manual Setup)
 
-To run the client manually in a Docker container, ensure Docker is installed on
+To run the bot manually in a Docker container, ensure Docker is installed on
 your system.
 
 Steps:
 
 1. Build the Docker image:
    ```sh
-   docker build -t client .
+   docker build -t bot .
    ```
 2. Run the Docker container:
    ```sh
-   docker run --rm client --nickname TEAM_NAME --host host.docker.internal
+   docker run --rm bot --nickname TEAM_NAME --host host.docker.internal
    ```
 
 If the server is running on your local machine, use the
@@ -284,8 +353,8 @@ you should modify the Dockerfile and change every occurrence of `x86_64` to
 
 ### What can we modify?
 
-You can modify the `src/agent/mod.rs` file to implement your own agent logic
-as well as create new files in the `src/agent` directory to implement additional
+You can modify the `src/bot/mod.rs` file to implement your own bot logic
+as well as create new files in the `src/bot` directory to implement additional
 functionality. In case you would like to implement new methods on existing
 structs, use the new type pattern or extension trait pattern.
 
@@ -301,7 +370,7 @@ If you need to include static files that your program should access during
 testing or execution, place them in the `data` folder. This folder is copied
 into the Docker image and will be accessible to your application at runtime. For
 example, you could include configuration files, pre-trained models, or any other
-data your agent might need.
+data your bot might need.
 
 ### In what format we will need to submit our bot?
 

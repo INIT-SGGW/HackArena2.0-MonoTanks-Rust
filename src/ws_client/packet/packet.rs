@@ -1,9 +1,9 @@
-use super::packets::agent_response::ability_type::AbilityType;
-use super::packets::agent_response::agent_response::AgentResponse;
-use super::packets::agent_response::move_direction::MoveDirection;
+use super::packets::bot_response::ability_type::AbilityType;
+use super::packets::bot_response::bot_response::BotResponse;
+use super::packets::bot_response::move_direction::MoveDirection;
 use super::packets::game_state::raw_game_state::RawGameState;
 use super::packets::lobby_data::LobbyData;
-use super::packets::{agent_response::rotation::Rotation, game_end::game_end::GameEnd};
+use super::packets::{bot_response::rotation::Rotation, game_end::game_end::GameEnd};
 use crate::ws_client::packet::empty_payload;
 use serde::{Deserialize, Serialize};
 
@@ -107,20 +107,20 @@ impl From<Packet> for String {
     }
 }
 
-impl AgentResponse {
+impl BotResponse {
     pub fn to_packet(self, game_state_id: String) -> Packet {
         match self {
-            AgentResponse::Movement { direction } => Packet::Movement {
+            BotResponse::Movement { direction } => Packet::Movement {
                 game_state_id,
                 direction,
             },
-            AgentResponse::Rotation {
+            BotResponse::Rotation {
                 tank_rotation,
                 turret_rotation,
             } if tank_rotation.is_none() && turret_rotation.is_none() => {
                 Packet::Pass { game_state_id }
             }
-            AgentResponse::Rotation {
+            BotResponse::Rotation {
                 tank_rotation,
                 turret_rotation,
             } => Packet::Rotation {
@@ -128,11 +128,11 @@ impl AgentResponse {
                 tank_rotation,
                 turret_rotation,
             },
-            AgentResponse::AbilityUse { ability_type } => Packet::AbilityUse {
+            BotResponse::AbilityUse { ability_type } => Packet::AbilityUse {
                 game_state_id,
                 ability_type,
             },
-            AgentResponse::Pass => Packet::Pass { game_state_id },
+            BotResponse::Pass => Packet::Pass { game_state_id },
         }
     }
 }

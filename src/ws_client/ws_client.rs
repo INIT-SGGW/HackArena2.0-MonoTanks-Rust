@@ -1,4 +1,4 @@
-use crate::agent::Agent;
+use crate::bot::Bot;
 use futures_util::stream::{SplitSink, SplitStream};
 use futures_util::{SinkExt, StreamExt};
 use std::sync::Arc;
@@ -48,10 +48,10 @@ impl WebSocketClient {
         let (write, read) = websocket_stream.split();
 
         let (tx, rx) = tokio::sync::mpsc::channel(100);
-        let agent = Arc::new(Mutex::new(None));
+        let bot = Arc::new(Mutex::new(None));
 
         let writer_task = Self::create_writer_task(write, rx, cancel_token.clone());
-        let read_task = Self::create_reader_task(read, tx, agent, cancel_token.clone());
+        let read_task = Self::create_reader_task(read, tx, bot, cancel_token.clone());
 
         Ok(WebSocketClient {
             read_task,
@@ -133,7 +133,7 @@ impl WebSocketClient {
     fn create_reader_task(
         mut read: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
         tx: Sender<Message>,
-        agent: Arc<Mutex<Option<Agent>>>,
+        bot: Arc<Mutex<Option<Bot>>>,
         cancel_token: CancellationToken,
     ) -> JoinHandle<Result<(), Error>> {
         tokio::spawn(async move {
@@ -142,7 +142,7 @@ impl WebSocketClient {
                     message = read.next() => {
                         match message {
                             Some(Ok(message)) => {
-                                Self::process_message(message, tx.clone(), agent.clone()).await;
+                                Self::process_message(message, tx.clone(), bot.clone()).await;
                             }
                             Some(Err(e)) => {
                                 eprintln!("[System] 🌋 WebSocket receive error: {}", e);
@@ -164,18 +164,14 @@ impl WebSocketClient {
         })
     }
 
-    async fn process_message(
-        message: Message,
-        tx: Sender<Message>,
-        agent: Arc<Mutex<Option<Agent>>>,
-    ) {
+    async fn process_message(message: Message, tx: Sender<Message>, bot: Arc<Mutex<Option<Bot>>>) {
         match message {
             Message::Text(message) => {
                 let tx_clone = tx.clone();
-                let agent_clone = agent.clone();
+                let bot_clone = bot.clone();
                 tokio::task::spawn(async move {
                     if let Err(e) =
-                        Self::process_text_message(message.clone(), tx_clone, agent_clone).await
+                        Self::process_text_message(message.clone(), tx_clone, bot_clone).await
                     {
                         eprintln!("[System] 🚨 Error processing text message -> {}", e);
                     }
@@ -200,7 +196,7 @@ impl WebSocketClient {
     async fn process_text_message(
         message: String,
         tx: tokio::sync::mpsc::Sender<Message>,
-        agent: Arc<Mutex<Option<Agent>>>,
+        bot: Arc<Mutex<Option<Bot>>>,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let packet: Packet = serde_json::from_str(&message)
             .map_err(|e| format!("🚨 Error parsing message -> {}", e))?;
@@ -238,8 +234,8 @@ impl WebSocketClient {
             Packet::GameStarting => {
                 println!("[System] 🎲 Game starting");
 
-                // Wait until agent is not None
-                while agent.lock().await.is_none() {
+                // Wait until bot is not None
+                while bot.lock().await.is_none() {
                     tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
                 }
 
@@ -250,40 +246,40 @@ impl WebSocketClient {
 
             Packet::LobbyData(lobby_data) => {
                 println!("[System] 🎳 Lobby data received");
-                handle_prepare_to_game(tx, agent, lobby_data).await?
+                handle_prepare_to_game(tx, bot, lobby_data).await?
             }
 
             Packet::GameStarted => println!("[System] 🎲 Game started"),
             Packet::GameState(raw_game_state) => {
                 // println!("🎮 Game state received");
-                handle_next_move(tx, agent, raw_game_state).await?
+                handle_next_move(tx, bot, raw_game_state).await?
             }
 
             Packet::GameEnded(game_end) => {
                 println!("[System] 🏁 Game ended");
-                handle_game_ended(agent, game_end).await?
+                handle_game_ended(bot, game_end).await?
             }
 
             // Warnings
             Packet::PlayerAlreadyMadeActionWarning => {
                 let warning = Warning::PlayerAlreadyMadeActionWarning;
-                handle_on_warning_received(agent, warning).await?;
+                handle_on_warning_received(bot, warning).await?;
             }
             Packet::MissingGameStateIdWarning => {
                 let warning = Warning::MissingGameStateIdWarning;
-                handle_on_warning_received(agent, warning).await?;
+                handle_on_warning_received(bot, warning).await?;
             }
             Packet::SlowResponseWarning => {
                 let warning = Warning::SlowResponseWarning;
-                handle_on_warning_received(agent, warning).await?;
+                handle_on_warning_received(bot, warning).await?;
             }
             Packet::ActionIgnoredDueToDeadWarning => {
                 let warning = Warning::ActionIgnoredDueToDeadWarning;
-                handle_on_warning_received(agent, warning).await?;
+                handle_on_warning_received(bot, warning).await?;
             }
             Packet::CustomWarning { message } => {
                 let warning = Warning::CustomWarning { message };
-                handle_on_warning_received(agent, warning).await?;
+                handle_on_warning_received(bot, warning).await?;
             }
 
             // Errors

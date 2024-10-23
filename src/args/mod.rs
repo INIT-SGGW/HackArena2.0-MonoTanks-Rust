@@ -1,9 +1,9 @@
 use clap::Parser;
 
-/// Command-line arguments for configuring the agent and connecting to a server.
+/// Command-line arguments for configuring the bot and connecting to a server.
 ///
 /// This structure defines the available parameters that can be passed via
-/// the command line to configure an agent in the game environment, including
+/// the command line to configure a bot in the game environment, including
 /// its nickname, server address, port, and optional access code.
 #[derive(Parser, Debug)]
 #[clap(
@@ -13,16 +13,16 @@ use clap::Parser;
     about = env!("CARGO_PKG_DESCRIPTION")
 )]
 pub struct Args {
-    /// Nickname of the agent that will be displayed in the game.
+    /// Nickname of the bot that will be displayed in the game.
     ///
-    /// This must be a unique identifier for the agent in the game environment.
+    /// This must be a unique identifier for the bot in the game environment.
     /// Nicknames that are already in use or not unique will cause conflicts.
     #[clap(short, long)]
     pub nickname: String,
 
     /// The IP address or domain name of the server to connect to.
     ///
-    /// The agent will attempt to establish a connection to the specified host.
+    /// The bot will attempt to establish a connection to the specified host.
     /// If not provided, it defaults to "localhost".
     #[clap(long, default_value = "localhost")]
     pub host: String,

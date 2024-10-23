@@ -1,8 +1,8 @@
-use crate::agent_trait::AgentTrait;
-use crate::ws_client::packet::packets::agent_response::ability_type::AbilityType;
-use crate::ws_client::packet::packets::agent_response::agent_response::AgentResponse;
-use crate::ws_client::packet::packets::agent_response::move_direction::MoveDirection;
-use crate::ws_client::packet::packets::agent_response::rotation::Rotation;
+use crate::bot_trait::BotTrait;
+use crate::ws_client::packet::packets::bot_response::ability_type::AbilityType;
+use crate::ws_client::packet::packets::bot_response::bot_response::BotResponse;
+use crate::ws_client::packet::packets::bot_response::move_direction::MoveDirection;
+use crate::ws_client::packet::packets::bot_response::rotation::Rotation;
 use crate::ws_client::packet::packets::game_end::game_end::GameEnd;
 use crate::ws_client::packet::packets::game_state::game_state::GameState;
 use crate::ws_client::packet::packets::game_state::tile::bullet::BulletType;
@@ -13,26 +13,26 @@ use crate::ws_client::packet::packets::game_state::tile::tile::TileEntity;
 use crate::ws_client::packet::packets::lobby_data::LobbyData;
 use crate::ws_client::packet::warning::Warning;
 
-pub struct Agent {
+pub struct Bot {
     my_id: String,
 }
 
-impl AgentTrait for Agent {
-    /// Called when the agent joins a lobby, creating a new instance of the agent.
-    /// This method initializes the agent with the lobby's current state and
+impl BotTrait for Bot {
+    /// Called when the bot joins a lobby, creating a new instance of the bot.
+    /// This method initializes the bot with the lobby's current state and
     /// other relevant details.
     ///
     /// # Parameters
-    /// - `lobby_data`: The initial state of the lobby when the agent joins.
+    /// - `lobby_data`: The initial state of the lobby when the bot joins.
     ///   Contains information like player data, game settings, etc.
     ///
     /// # Returns
-    /// - A new instance of the agent.
+    /// - A new instance of the bot.
     fn on_joining_lobby(lobby_data: LobbyData) -> Self
     where
         Self: Sized,
     {
-        Agent {
+        Bot {
             my_id: lobby_data.player_id,
         }
     }
@@ -46,7 +46,7 @@ impl AgentTrait for Agent {
     /// # Parameters
     /// - `lobby_data`: The updated state of the lobby, containing information
     ///   like player details, game configurations, and other relevant data.
-    ///   This is the same data structure as the one provided when the agent
+    ///   This is the same data structure as the one provided when the bot
     ///   first joined the lobby.
     ///
     /// # Default Behavior
@@ -57,18 +57,18 @@ impl AgentTrait for Agent {
     }
 
     /// Called after each game tick, when new game state data is received from the server.
-    /// This method is responsible for determining the agent's next move based on the
+    /// This method is responsible for determining the bot's next move based on the
     /// current game state.
     ///
     /// # Parameters
     /// - `game_state`: The current state of the game, which includes all
-    ///   necessary information for the agent to decide its next action,
+    ///   necessary information for the bot to decide its next action,
     ///   such as the entire map with walls, tanks, bullets, zones, etc.
     ///
     /// # Returns
-    /// - `AgentResponse`: The action or decision made by the agent, which will
+    /// - `BotResponse`: The action or decision made by the bot, which will
     ///   be communicated back to the game server.
-    fn next_move(&mut self, game_state: GameState) -> AgentResponse {
+    fn next_move(&mut self, game_state: GameState) -> BotResponse {
         // Print map
         println!("Map:");
         for row in &game_state.map {
@@ -152,7 +152,7 @@ impl AgentTrait for Agent {
 
         // If our tank is not found, it is dead, and we should pass
         if my_tank.is_none() {
-            return AgentResponse::Pass;
+            return BotResponse::Pass;
         }
 
         // Do a random action
@@ -164,7 +164,7 @@ impl AgentTrait for Agent {
                     MoveDirection::Backward
                 };
 
-                AgentResponse::Movement { direction }
+                BotResponse::Movement { direction }
             }
             r if r < 0.50 => {
                 let random_rotation = || match rand::random::<f32>() {
@@ -173,7 +173,7 @@ impl AgentTrait for Agent {
                     _ => None,
                 };
 
-                AgentResponse::Rotation {
+                BotResponse::Rotation {
                     tank_rotation: random_rotation(),
                     turret_rotation: random_rotation(),
                 }
@@ -193,14 +193,14 @@ impl AgentTrait for Agent {
                     AbilityType::UseRadar
                 };
 
-                AgentResponse::AbilityUse { ability_type }
+                BotResponse::AbilityUse { ability_type }
             }
-            _ => AgentResponse::Pass,
+            _ => BotResponse::Pass,
         }
     }
 
     /// Called when a warning is received from the server.
-    /// Please, do remember that if you agent is stuck on processing warning,
+    /// Please, do remember that if your bot is stuck on processing warning,
     /// the next move won't be called and vice versa.
     ///
     /// # Parameters
@@ -229,8 +229,7 @@ impl AgentTrait for Agent {
     ///
     /// # Default Behavior
     /// By default, this method performs no action. You can override it to
-    /// implement any post-game behavior, such as logging, updating agent strategies,
-    /// or other clean-up tasks.
+    /// implement any post-game behavior, such as logging or other clean-up tasks.
     ///
     /// # Notes
     /// - This method is optional to override, but it can be useful for handling

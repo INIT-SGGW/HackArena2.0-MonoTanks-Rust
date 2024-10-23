@@ -1,9 +1,9 @@
 use super::ability_type::AbilityType;
-use super::rotation::Rotation;
 use super::move_direction::MoveDirection;
+use super::rotation::Rotation;
 
-/// Represents the various responses an agent can have in the system.
-pub enum AgentResponse {
+/// Represents the various responses a bot can have in the system.
+pub enum BotResponse {
     /// Represents a movement action for a tank.
     ///
     /// ### Fields
@@ -26,7 +26,7 @@ pub enum AgentResponse {
     /// - `ability_type`: The type of ability to use.
     AbilityUse { ability_type: AbilityType },
 
-    /// Represents a pass action, where the agent chooses to do nothing.
-    /// It is useful when the agent want to wait on a site or when it is dead.
+    /// Represents a pass action, where the bot chooses to do nothing.
+    /// It is useful when the bot want to wait on a site or when it is dead.
     Pass,
 }

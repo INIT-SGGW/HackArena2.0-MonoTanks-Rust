@@ -1,5 +1,5 @@
-use crate::agent::Agent;
-use crate::agent_trait::AgentTrait;
+use crate::bot::Bot;
+use crate::bot_trait::BotTrait;
 use crate::ws_client::packet::packet::Packet;
 use crate::ws_client::packet::packets::lobby_data::LobbyData;
 use std::sync::Arc;
@@ -8,18 +8,18 @@ use tokio_tungstenite::tungstenite::Message;
 
 pub async fn handle_prepare_to_game(
     tx: tokio::sync::mpsc::Sender<Message>,
-    agent: Arc<Mutex<Option<Agent>>>,
+    bot: Arc<Mutex<Option<Bot>>>,
     lobby_data: LobbyData,
 ) -> Result<(), String> {
-    let mut agent_guard = agent.lock().await;
+    let mut bot_guard = bot.lock().await;
 
-    match agent_guard.as_mut() {
-        Some(agent) => agent.on_lobby_data_changed(lobby_data),
+    match bot_guard.as_mut() {
+        Some(bot) => bot.on_lobby_data_changed(lobby_data),
         None => {
             let sandbox_mode = lobby_data.server_settings.sandbox_mode;
 
-            *agent_guard = Some(Agent::on_joining_lobby(lobby_data));
-            println!("[System] 🤖 Created agent");
+            *bot_guard = Some(Bot::on_joining_lobby(lobby_data));
+            println!("[System] 🤖 Created bot");
 
             if sandbox_mode {
                 println!("[System] 🛠️ Sandbox mode enabled");

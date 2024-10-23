@@ -31,4 +31,7 @@ pub struct ServerSettings {
 
     /// The name of the match.
     pub match_name: Option<String>,
+
+    /// The version of the game running on the server.
+    pub version: String,
 }
