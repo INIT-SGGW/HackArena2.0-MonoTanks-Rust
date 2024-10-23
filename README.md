@@ -1,7 +1,7 @@
 # MonoTanks API wrapper in Rust for HackArena 2.0
 
 This API wrapper for MonoTanks game for the HackArena 2.0, organized by
-WULS-SGGW. It is implemented as a WebSocket client written in Rust programming
+KN init. It is implemented as a WebSocket client written in Rust programming
 language and can be used to create bots for the game.
 
 To fully test and run the game, you will also need the game server and GUI
