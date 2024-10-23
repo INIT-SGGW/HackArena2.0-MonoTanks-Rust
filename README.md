@@ -8,7 +8,7 @@ To fully test and run the game, you will also need the game server and GUI
 client, as the GUI provides a visual representation of gameplay. You can find
 more information about the server and GUI client in the following repository:
 
-- [Server and GUI Client Repository](https://github.com/INIT-SGGW/HackArena2024H2-Game)
+- [Server and GUI Client Repository](https://github.com/INIT-SGGW/HackArena2.0-MonoTanks)
 
 The guide to the game mechanics and tournament rules can be found on the:
 - [instruction page](https://github.com/INIT-SGGW/HackArena2024H2-Game/blob/main/README.md).
@@ -17,10 +17,10 @@ The guide to the game mechanics and tournament rules can be found on the:
 
 Clone this repo using git:
 ```sh
-git clone https://github.com/INIT-SGGW/HackArena2024H2-Rust.git
+git clone https://github.com/INIT-SGGW/HackArena2.0-MonoTanks-Rust.git
 ```
 
-or download the [zip file](https://github.com/INIT-SGGW/HackArena2024H2-Rust/archive/refs/heads/main.zip)
+or download the [zip file](https://github.com/INIT-SGGW/HackArena2.0-MonoTanks-Rust/archive/refs/heads/main.zip)
 and extract it.
 
 The bot logic you are going to implement is located in `src/bot/mod.rs`:
