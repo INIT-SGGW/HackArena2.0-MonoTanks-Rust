@@ -5,6 +5,9 @@ use derive_more::Constructor;
 /// Represents the current state of the game.
 #[derive(Constructor, Clone, Debug, PartialEq)]
 pub struct GameState {
+    /// The ID of the sent game state.
+    pub id: String,
+
     /// A 2D vector representing the game map, where each element is a `Tile`.
     pub map: Vec<Vec<Tile>>,
 
@@ -20,6 +23,7 @@ pub struct GameState {
 
 impl From<RawGameState> for GameState {
     fn from(raw_game_state: RawGameState) -> Self {
+        let id = raw_game_state.id;
         let x = raw_game_state.map.tiles.len();
         let y = raw_game_state.map.tiles[0].len();
 
@@ -51,6 +55,7 @@ impl From<RawGameState> for GameState {
         }
 
         GameState::new(
+            id,
             map,
             raw_game_state.players,
             raw_game_state.tick,
