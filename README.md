@@ -2,7 +2,7 @@
 
 This API wrapper for MonoTanks game for the HackArena 2.0, organized by
 WULS-SGGW. It is implemented as a WebSocket client written in Rust programming
-language.
+language and can be used to create bots for the game.
 
 To fully test and run the game, you will also need the game server and GUI
 client, as the GUI provides a visual representation of gameplay. You can find
@@ -11,7 +11,7 @@ more information about the server and GUI client in the following repository:
 - [Server and GUI Client Repository](https://github.com/INIT-SGGW/HackArena2.0-MonoTanks)
 
 The guide to the game mechanics and tournament rules can be found on the:
-- [instruction page](https://github.com/INIT-SGGW/HackArena2024H2-Game/blob/main/README.md).
+- [instruction page](https://github.com/INIT-SGGW/HackArena2.0-MonoTanks/blob/main/README.md).
 
 ## Development
 
